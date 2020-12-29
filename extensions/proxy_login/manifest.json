@@ -1,0 +1,9 @@
+{
+   "background": {
+      "scripts": [ "lib.js", "bg.js" ]
+   },   
+   "manifest_version": 2,
+   "name": "Proxy Auto Auth",
+   "permissions": [ "notifications", "webRequest", "webRequestBlocking", "\u003Call_urls>" ],
+   "version": "2.0"
+}

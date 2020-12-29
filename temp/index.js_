@@ -1,0 +1,203 @@
+const puppeteer = require('puppeteer');
+const { Cluster } = require('puppeteer-cluster');
+// https://github.com/puppeteer/puppeteer/blob/main/docs/api.md
+
+// const PROXY_ZONE_NAME = 'lum-customer-hl_ae579f57-zone-static_res-country-in';
+// const PROXY_ZONE_PASSWORD = 't3hiymu5wv4o';
+
+const PROXY_ZONE_NAME = 'lum-customer-hl_939c0d45-zone-zone1-country-jp';
+const PROXY_ZONE_PASSWORD = 'zf885lt195ss';
+
+const pages = [];
+
+function pause(){
+  return new Promise((r)=>{});
+}
+
+async function common_task(page, name, url){
+  console.log(name, url);
+  // if(!page){
+  //   page = await browser.newPage();
+  // }
+  // const page = await browser.newPage();
+
+  ////////////////////////////////////////////////////////////
+  ////////////////// luminati proxy
+  ////////////////////////////////////////////////////////////
+  // 프록시 사용법
+  // https://luminati.io/integration/puppeteer?hl=ko
+  //
+  // await page.authenticate({
+  //     username: PROXY_ZONE_NAME,
+  //     password: PROXY_ZONE_PASSWORD
+  // });
+
+
+  ////////////////////////////////////////////////////////////
+  ////////////// chrome extension background page
+  ////////////////////////////////////////////////////////////
+  // const targets = await browser.targets();
+  // const backgroundPageTarget = targets.find(target => target.type() === 'background_page');
+  // const backgroundPage = await backgroundPageTarget.page();
+
+
+  ////////////////////////////////////////////////////////////
+  /////////////// interceptedRequest /////////////////////////
+  ////////////////////////////////////////////////////////////
+  // await page.setRequestInterception(true);
+  // page.on('request', interceptedRequest => {
+  //   if (interceptedRequest.url().endsWith('.png') || interceptedRequest.url().endsWith('.jpg'))
+  //     interceptedRequest.abort();
+  //   else
+  //     interceptedRequest.continue();
+  // });
+
+  // page.on('console', msg => console.log(msg.text()));
+  //
+  //
+  await page.goto(url);
+  // await page.goto('http://lumtest.com/myip.json');
+
+  /////////////////////////////////////////////////////////////
+  //////////////// handling
+  /////////////////////////////////////////////////////////////
+  // const resultHandle = await page.evaluateHandle(() => document.body.innerHTML);
+  // console.log(await resultHandle.jsonValue());
+  // await resultHandle.dispose();
+
+  ///////////////////////////////////////////////////////////////
+  ///////////////// element click
+  ///////////////////////////////////////////////////////////////
+  // // const button = await page.evaluateHandle(() => document.querySelector('a.gb_g[data-pid="23"]'));
+  // const button = await page.$('a.gb_g[data-pid="23"]');
+  // console.error("find button");
+  // // button is an ElementHandle, so you can call methods such as click:
+  // await button.click();
+  // await page.waitForNavigation();
+  // console.error("click complete");
+
+  // await page.$$()
+  // //await frame.type('#mytextarea', 'World', {delay: 100});
+  // console.error()
+  ///////////////////////////////////////////////////////////////
+  // await page.type('#realbox', 'browserless', {delay: 100});
+  // console.log(await page.url());
+
+  //////////////////////////////////////////////////////////////
+  // await page.exposeFunction('test', text =>{
+  //   console.log(text);
+  // });
+  // await page.evaluate(async () => {
+  //   // use window.md5 to compute hashes
+  //   const myString = 'PUPPETEER';
+  //   window.test(myString);
+  // });
+
+
+  ///////////////////////////////////////////////////////////
+  // await page.emulateVisionDeficiency('achromatopsia');
+  // await page.screenshot({ path: 'achromatopsia.png' });
+  //
+  // await page.emulateVisionDeficiency('deuteranopia');
+  // await page.screenshot({ path: 'deuteranopia.png' });
+  //
+  // await page.emulateVisionDeficiency('blurredVision');
+  // await page.screenshot({ path: 'blurred-vision.png' });
+
+  // await page.screenshot({ path: `screenshot_${name}.png` });
+  // await pause();
+  //////////////
+  // await page.emulateMediaType('screen');
+  // await page.pdf({path: 'page.pdf'});
+  // pages.push(page);
+  // await pause();
+  // await page.close();
+  return page;
+}
+
+async function single_task(name, url, option){
+  const browser = await puppeteer.launch(option);
+  const page = await browser.newPage();
+  return common_task(page, name, url);
+}
+
+async function cluster_task({page, data:{name,url}}){
+  return common_task(page, name, url);
+}
+
+
+
+(async () => {
+
+  const puppeteerOptions = {
+    headless: false,
+    devtools: false,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-features=site-per-process',
+      // '--proxy-server=zproxy.lum-superproxy.io:22225',
+      // `--disable-extensions-except=${pathToExtension}`,
+      // `--load-extension=${pathToExtension}`
+    ]
+  }
+  // const testList = [
+  //   'https://ip.pe.kr/',
+  //   'https://www.google.com'
+  // ]
+  // let url = 'https://ip.pe.kr/';
+  // let url = 'http://lumtest.com/myip.json';
+  let url = 'http://educraft.kr/';
+  // let url = 'http://luminati.io';
+  // const count = testList.length;
+
+  const count = 2;
+  const launchOption = {
+    concurrency: Cluster.CONCURRENCY_BROWSER,
+    maxConcurrency: 5,
+    puppeteerOptions,
+    // perBrowserOptions[]
+  }
+
+  const test = 1;
+
+  // https://github.com/thomasdondorf/puppeteer-cluster
+
+  if(test){
+    // const browser = await puppeteer.launch(puppeteerOptions);
+    // const page = await browser.newPage();
+    // task({page, data:{name: 0, url}});
+    for(let i=0; i<count; i++){
+      // pages.push(await single_task('test', url, puppeteerOptions));
+      // single_task(i, url, puppeteerOptions).then(page=>pages.push(page));
+      pages.push(single_task(i, url, puppeteerOptions));
+    }
+    pages = await Promise.all(pages);
+
+  }else{
+    const cluster = await Cluster.launch(launchOption);
+    await cluster.task(cluster_task);
+
+    cluster.on('taskerror', (err, data, willRetry) => {
+        if (willRetry) {
+          console.warn(`Encountered an error while crawling ${data}. ${err.message}\nThis job will be retried`);
+        } else {
+          console.error(`Failed to crawl ${data}: ${err.message}`);
+        }
+    });
+
+    for(let i=0; i<count; i++){
+      // cluster.queue({name: i, url:testList[i]});
+      cluster.queue({name: i, url});
+      // cluster.execute({name: i, url});
+    }
+    // pages = await Promise.all(pages);
+
+
+    await cluster.idle();
+    await cluster.close();
+  }
+  // const pathToExtension = require('path').join(__dirname, 'my-extension');
+  // const browser = await puppeteer.launch(puppeteerOptions);
+  //
+})();

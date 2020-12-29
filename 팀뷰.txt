@@ -1,0 +1,10 @@
+탈퇴한계정, [29.09.20 17:43]
+homtengu@gmail.com
+apqlAs4103@
+
+
+
+Proxy: zproxy.lum-superproxy.io
+Port: 22225
+User: lum-customer-hl_ae579f57-zone-static_res-country-in
+Password: t3hiymu5wv4o
