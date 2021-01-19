@@ -7,6 +7,12 @@ const fsp = fs.promises;
 
 module.exports = {
   appDataPath,
+  getParamString(paramObj){
+    return Object.keys(paramObj).map(key=>{
+      return key+'='+paramObj[key];
+    }).join('&');
+  },
+
   getIP(){
     return axios.get("https://lumtest.com/myip.json").then(res=>res.data);
   },

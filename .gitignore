@@ -1,2 +1,5 @@
 node_modules/
 chromium/
+test/
+test.zip
+yb-program.exe

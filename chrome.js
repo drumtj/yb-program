@@ -5,12 +5,25 @@ const {spawn, spawnSync} = require("child_process");
 const path = require("path");
 const {mkdir, appDataPath} = require("./util.js");
 const {USE_PROXY, PROXY_SERVER} = require('./config.js');
+const fs = require("fs");
+const dirname = process.cwd();//path.join(__dirname, process.cwd());
+// const dirname = '__dirname;
 
-const proxyLoginExtensionPath = __dirname + '/extensions/proxy_login';
-const mainExtensionPath = __dirname + '/extensions/main';
-const chromeUrl = __dirname + "/chromium/chrome.exe";
+// const proxyLoginExtensionPath = path.join(__dirname, "extensions/proxy_login");//__dirname + '/extensions/proxy_login';
+// const mainExtensionPath = path.join(__dirname, "extensions/main");//__dirname + '/extensions/main';
+const proxyLoginExtensionPath = dirname + '/extensions/proxy_login';
+const mainExtensionPath = dirname + '/extensions/main';
+const chromeUrl = dirname + "/chromium/chrome.exe";
 const rootFolder = 'yb';
 
+console.log(proxyLoginExtensionPath);
+//proxyExtensionManifest.test = '??';
+
+//console.log(JSON.parse(fs.readFileSync(proxyLoginExtensionPath + '/manifest_test.json', "utf8")));
+
+// console.log("dirname", dirname);
+// console.log("execPath", process.execPath);
+// console.log("cwd", process.cwd());
 // async function mkdir(_path){
 //   try{
 //     await fsp.access(_path, fs.constants.R_OK | fs.constants.W_OK);
@@ -18,9 +31,20 @@ const rootFolder = 'yb';
 //     await fsp.mkdir(_path, {recursive:true});
 //   }
 // }
-module.exports = async function chrome(bid, headless, startingUrl){
+module.exports = async function chrome(bid, headless, startingUrl, proxy){
   // pid = Date.now()+'_'+(Math.ceil(Math.random()*0xffffff)).toString(16);
   // pid = '1607533699297_e13f10';//-> 프로그램 id로 하면 될듯.
+
+  // console.error("??",proxy);
+  if(proxy){
+    let proxyExtensionManifest = JSON.parse(fs.readFileSync(proxyLoginExtensionPath + '/manifest.json', "utf8"));
+    proxyExtensionManifest.proxy = proxy;
+    fs.writeFileSync(proxyLoginExtensionPath + '/manifest.json', JSON.stringify(proxyExtensionManifest));
+
+    let mainExtensionManifest = JSON.parse(fs.readFileSync(mainExtensionPath + '/manifest.json', "utf8"));
+    mainExtensionManifest.proxy = proxy;
+    fs.writeFileSync(mainExtensionPath + '/manifest.json', JSON.stringify(mainExtensionManifest));
+  }
 
   let userFolder;
 

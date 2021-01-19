@@ -1,0 +1,13 @@
+{
+  "background": {
+    "scripts": ["lib.js", "bg.js"]
+  },
+  "manifest_version": 2,
+  "name": "Proxy Auto Auth",
+  "permissions": ["notifications", "webRequest", "webRequestBlocking", "<all_urls>"],
+  "version": "2.0",
+  "proxy": {
+    "zone": "lum-customer-c_ae579f57-zone-germany",
+    "pw": "jsofzqjgdfsk"
+  }
+}

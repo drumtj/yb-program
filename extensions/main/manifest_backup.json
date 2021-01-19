@@ -1,0 +1,19 @@
+{
+   "background": {
+      "scripts": [ "base64.min.js", "uuid.min.js", "axios.min.js", "lib.js", "logger.js", "papi.js", "api.js", "bg.js" ]
+   },
+   "content_scripts": [{
+     "matches": ["http://*/main.html*"],
+     "js": ["lib.js"],
+     "run_at": "document_end"
+    },{
+      "matches": ["https://*.bet365.com/*", "https://*.bet365.de/*", "https://*.nj.bet365.com/*"],
+      "js": ["jquery-3.5.1.slim.min.js", "lib.js", "logger.js", "bet365.js"],
+      "run_at": "document_end"
+     }],
+   "manifest_version": 2,
+   "name": "main",
+   "permissions": [ "tabs", "activeTab", "notifications", "webRequest", "webRequestBlocking", "\u003Call_urls>" ],
+   "web_accessible_resources": ["*.js"],
+   "version": "2.0"
+}

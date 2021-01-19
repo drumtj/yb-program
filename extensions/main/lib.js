@@ -1,5 +1,5 @@
 const HOST_URL = "http://localhost:8080";
-const API_BASEURL = "http://localhost:4500/api";
+const API_BASEURL = "http://175.196.220.135/api";
 let EMAIL = null;
 let BID = null;
 const PN_B365 = "bet365";
@@ -9,6 +9,50 @@ const DEBUG = true;
 const MAX_LOG_LENGTH = 1000;
 
 let DATA = {};
+
+
+function getIP(){
+	let manifest = chrome.runtime ? chrome.runtime.getManifest() : null;
+	let obj;
+	if(manifest){
+		obj = {
+			proxy: {
+				host: "https://zproxy.lum-superproxy.io",
+				port: 22225,
+				auth: {
+					username: manifest.proxy.user,
+					password: manifest.proxy.pw
+				}
+			}
+		}
+	}
+	return axios.get("https://ip.pe.kr", obj).then(res=>{
+		try{
+			return res.data.match(/<h1[^>]+>([^<]+)<\/h1>/)[1].trim();
+		}catch(e){
+			return "";
+		}
+	})
+}
+
+async function inputWithEvent(selector, value){
+	await until(()=>$(selector).length>0);
+	eval(`var el = document.querySelector("${selector}");
+	if(el){
+		var event = new CustomEvent("input");
+		el.value = "${value}";
+		el.dispatchEvent(event);
+	}`)
+}
+
+function getUrlParams(url){
+	url = url||window.location.href;
+	return url.split('?').pop().split('&').reduce((r,v)=>{
+		let kv = v.split('=');
+		r[kv[0]] = kv[1];
+		return r;
+	},{})
+}
 
 function setData(key, data){
 	DATA[key] = data;
@@ -92,13 +136,13 @@ function findElAll(selector, timeout=0){
       // console.error("findEl", selector);
       let $r, arr;
 
-			let f = true;
+			let f = false;
       arr = selector.map(s=>{
         let $s = $(s);
         if($s.length){
+					f = true;
           return $s;
         }else{
-					f = false;
           return null;
         }
       })
@@ -117,7 +161,15 @@ function findElAll(selector, timeout=0){
   })
 }
 
-function until(findFunc, timeout=0){
+function pause(fn){
+	return new Promise(resolve=>{
+		if(typeof fn === "function"){
+			fn(resolve);
+		}
+	})
+}
+
+function until(findFunc, timeout=0, cancelObj){
   return new Promise(resolve=>{
     let dt = Date.now();
     function fn(){
@@ -131,6 +183,26 @@ function until(findFunc, timeout=0){
         }
       }
     }
+		if(typeof cancelObj === "object"){
+			cancelObj.cancel = function(){
+				cancelIdleCallback(fn);
+			}
+		}
     fn()
   })
 }
+
+const calc = {
+    stakeB: function (oddA, oddB, stakeA) {
+        return oddA / oddB * stakeA;
+    },
+    investment: function (oddA, oddB, stakeA) {
+        return this.stakeB(oddA, oddB, stakeA) + stakeA;
+    },
+    profit: function (oddA, oddB, stakeA) {
+        return oddA * stakeA - this.investment(oddA, oddB, stakeA);
+    },
+    profitP: function (oddA, oddB, stakeA) {
+        return this.profit(oddA, oddB, stakeA) / this.investment(oddA, oddB, stakeA);
+    }
+};

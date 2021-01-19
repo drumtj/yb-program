@@ -23,9 +23,20 @@ function setupAPI(baseURL, email){
 
   function err(e){
     // console.error(e);
-    return {
-      status: 'fail',
-      message: (e.data && e.data.message) ? e.data.message : e.response.statusText
+    if(e.response){
+      if(e.response.data && e.response.data.status == "fail"){
+        return e.response.data;
+      }else{
+        return {
+          status: 'fail',
+          message: e.response.statusText
+        }
+      }
+    }else{
+      return {
+        status: 'fail',
+        message: 'empty response'
+      }
     }
   }
 
@@ -36,6 +47,15 @@ function setupAPI(baseURL, email){
   }
 
   return {
+
+    getPncinfo(email){
+      return ax('/get_pncinfo/' + email);
+    },
+
+    // getSetting(){
+    //   return ax('/get_setting');
+    // },
+
     balance(){
       return ax('/balance');
     },
@@ -54,6 +74,10 @@ function setupAPI(baseURL, email){
 
     loadBrowser(bid){
       return ax('/load_browser/' + bid);
+    },
+
+    bet(data){
+      return ax('/input_bet', data, "POST");
     }
   }
 }

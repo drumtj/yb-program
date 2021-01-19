@@ -1,10 +1,15 @@
 console.log("injection.js");
 
+let localScripts = ["base64.min.js", "uuid.min.js", "axios.min.js", "jquery-3.5.1.slim.min.js", "lib.js", "papi.js", "api.js", "main.js"];
+
 let scripts = [
   "https://jsgetip.appspot.com",
-  chrome.extension.getURL("jquery-3.5.1.slim.min.js"),
-  chrome.extension.getURL("lib.js"),
-  chrome.extension.getURL("main.js")
+  "https://cdn.socket.io/socket.io-3.0.1.min.js",
+  // "/socket.io/socket.io.js",
+  ...localScripts.map(o=>chrome.extension.getURL(o))
+  // chrome.extension.getURL("jquery-3.5.1.slim.min.js"),
+  // chrome.extension.getURL("lib.js"),
+  // chrome.extension.getURL("main.js")
 ]
 
 init();

@@ -38,6 +38,11 @@ chrome.webRequest.onAuthRequired.addListener(
 			console.log('AUTH - ' + details.requestId);
 			//console.log(JSON.stringify(details));
 
+			console.error({
+				login: localStorage["proxy_login"],
+				pw: localStorage["proxy_password"]
+			});
+
 			if(!(idstr in calls)){
 				calls[idstr] = 0;
 			}

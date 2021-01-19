@@ -7,26 +7,29 @@
     <style media="screen">
       .log-container {
         width: 100%;
-        height: 800px;
+        height: 650px;
         border: solid 2px black;
         overflow-y: auto;
       }
       .log-line {
         border-bottom: dashed 1px gray;
       }
-      .log-info {
+      .log-secondary, .text-secondary {
+        color: #9a9a9a;
+      }
+      .log-info, .text-info {
         color: #4799eb;
       }
-      .log-warning {
+      .log-warning, .text-warning {
         color: #e6ad0c;
       }
-      .log-danger {
+      .log-danger, .text-danger {
         color: #f31111;
       }
-      .log-success {
+      .log-success, .text-success {
         color: #36b962;
       }
-      .log-primary {
+      .log-primary, .text-primary {
         color: #5544ed;
       }
     </style>
@@ -37,6 +40,6 @@
 <div class="log-container">
 
 </div>
-<script src="/socket.io/socket.io.js"></script>
+<!-- <script src="/socket.io/socket.io.js"></script> -->
 </body>
 </html>

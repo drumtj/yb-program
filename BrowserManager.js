@@ -1,5 +1,11 @@
+const {v4:uuidv4} = require('uuid');
 const chromeOpen = require('./chrome');
-const {LOCAL_MAIN_URL, EMAIL} = require('./config');
+const {LOCAL_MAIN_URL} = require('./config');
+// const api = require('./api');
+const API = require('./api');
+let api;
+const {getParamString} = require('./util');
+let EMAIL;
 
 var browsers = {};
 Object.defineProperty(browsers, "kill", {
@@ -35,7 +41,34 @@ async function openBrowser(bid, browserData){
     return;
   }
 
-  let prc = await chromeOpen(bid, false, LOCAL_MAIN_URL + `?bid=${bid}&email=${EMAIL}`);
+  // let browserInfo = await api.loadBrowser(bid);
+  // if(browserInfo.status != "success"){
+  //   console.error(bid, "브라우져 정보 가져오기 실패", browserInfo.message);
+  //   return;
+  // }
+  // console.error(browserInfo);
+  let countryCode = browserData.account.country;
+  let proxy = await api.getProxy(countryCode);
+  if(proxy.status != "success"){
+    console.error(bid, "프록시 정보 가져오기 실패", proxy.message);
+    return;
+  }
+
+  // console.log(browserData.option);
+  // console.log(browserData.option.dataType);
+  // console.log(browserData.option.data.dataType=="betburger" || browserData.option.data.action == "checkBetmax");
+
+  let paramObj = {
+    bid,
+    email:EMAIL,
+    countryCode,
+    needPnc: browserData.option.data.dataType=="betburger" || browserData.option.data.action == "checkBetmax"
+  }
+  let paramStr = getParamString(paramObj);
+
+
+
+  let prc = await chromeOpen(bid, false, LOCAL_MAIN_URL + '?' + paramStr, proxy.data);
   let browser = createBrowswerObject(prc, browserData);
   browsers[bid] = browser;
   prc.on('exit', function (code) {
@@ -85,26 +118,51 @@ function closeBrowserAll(){
   browsers.kill();
 }
 
-function getLivingBrowsers(){
-  return Object.keys(browsers);
+async function getLivingBrowsers(){
+  let r = {};
+  for(let bid in browsers){
+    r[bid] = await emitPromise(bid, "getState");
+  }
+  return r;
+
+  // return Object.keys(browsers).reduce(async (r,v)=>{
+  //   // emit(v, "test", null);
+  //   let state = await emitPromise(v, "getState");
+  //   r[v] = state;
+  //   return r;
+  // }, {})
+
+  // return Object.keys(browsers);
+
   // .reduce((r,bid)=>{
   //   r[bid] = browsers[bid].killed;
   //   return r;
   // }, {})
 }
 
+let resolveList = {};
 function setSocket(bid, socket){
   if(!browsers[bid]){
-    console.error(`setSocket 브라우져(${bid})가 없습니다.`)
+    // console.error(`setSocket 브라우져(${bid})가 없습니다.`);
     return;
   }
 
   browsers[bid].socket = socket;
+
+  socket.on("resolve", (data, uuid)=>{
+    if(resolveList[uuid]){
+      resolveList[uuid](data);
+      delete resolveList[uuid];
+    }
+  })
 }
 
 function getSocket(bid){
+  if(bid === undefined){
+    return Object.keys(browsers).map(k=>browsers[k].socket);
+  }
   if(!browsers[bid]){
-    console.error(`getSocket 브라우져(${bid})가 없습니다.`)
+    // console.error(`getSocket 브라우져(${bid})가 없습니다.`);
     return;
   }
 
@@ -117,6 +175,28 @@ function emit(bid, event, data){
   let socket = getSocket(bid);
   if(socket){
     socket.emit(event, data);
+  }
+}
+
+function emitTo(room, event, data){
+  // console.log("emitTo:", room);
+  io.to(room).emit(event, data);
+}
+
+function emitAll(event, data){
+  getSocket().forEach(socket=>socket.emit(event, data))
+}
+
+function emitPromise(bid, event, data){
+  let socket = getSocket(bid);
+  if(socket){
+    let id = uuidv4();
+    socket.emit(event, data, id);
+    return new Promise(resolve=>{
+      resolveList[id] = resolve;
+    })
+  }else{
+    return Promise.resolve();
   }
 }
 
@@ -135,7 +215,46 @@ function sendDataToBet365(bid, com, data){
   }
 }
 
+function sendDataToMain(bid, com, data){
+  // emit(bid, com, data);
+  let socket = getSocket(bid);
+  if(socket){
+    socket.emit("sendData", {com, data, to:"main"});
+  }
+}
+
+
+function setEmail(email){
+  EMAIL = email;
+  api = API(email);
+}
+
+let io;
+function setIO(_io){
+  io = _io;
+}
+
+function join(bid, room){
+  let socket = getSocket(bid);
+  if(socket){
+    // console.log("join room:", room);
+    socket.join(room);
+  }
+}
+
+function leave(bid, room){
+  let socket = getSocket(bid);
+  if(socket){
+    socket.leave(room);
+  }
+}
+
 module.exports = {
+  emitTo,
+  leave,
+  join,
+  setIO,
+  setEmail,
   getBrowser,
   getBrowsers,
   openBrowser,
@@ -145,6 +264,8 @@ module.exports = {
   setSocket,
   getSocket,
   emit,
+  emitAll,
+  emitPromise,
   sendDataToBg,
   sendDataToBet365,
   closeBrowserAll
