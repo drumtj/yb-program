@@ -78,6 +78,10 @@ function setupAPI(baseURL, email){
 
     bet(data){
       return ax('/input_bet', data, "POST");
+    },
+    
+    saveTestData(data){
+      return ax("/input_test_data", data, "POST");
     }
   }
 }

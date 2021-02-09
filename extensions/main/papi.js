@@ -47,7 +47,7 @@ class PAPI {
       }
     })
 
-    console.log("?", Base64.encode(id+':'+pw));
+    // console.log("?", Base64.encode(id+':'+pw));
   }
 
   _ax(url, data, method='GET', headers){
@@ -80,6 +80,16 @@ class PAPI {
     });
   }
 
+  getBalance(){
+    // response example
+    // {
+    // "availableBalance": 0,
+    // "outstandingTransactions": 0,
+    // "givenCredit": 0,
+    // "currency": "string"
+    // }
+    return this._ax("/v1/client/balance");
+  }
 
 
   // sportId
@@ -810,6 +820,7 @@ class PAPI {
           eventId,
           periodNumber,
           stake: minRiskStake,
+          // stake: minWinStake,
           winRiskStake,
           betType,
           oddsFormat: oddsFormat.toUpperCase(),
@@ -846,70 +857,70 @@ class PAPI {
 
 
 
-  async minBet({sportId, eventId, betType, team, side, periodNumber, handicap}){
-    let data = await this.getEvents({sportId, eventIds:eventId});
-    console.error("event", data);
-    if(!data){
-      console.error("loading event fail");
-      return;
-    }
-
-    if(data.code){
-      console.error(data);
-      return;
-    }
-
-  	let leagueId = data.league[0].id;
-  	let starts = data.league[0].events[0].starts;
-
-    console.error({leagueId});
-
-  	let toDate = "";
-    //let periodNumber = 0;
-    //let betType = "MONEYLINE";
-    let oddsFormat = "Decimal";
-    //let handicap = null;
-    //let team = "Team2";
-    //let side = null;
-    //let stake = 1;
-    let winRiskStake = "RISK";//WIN, RISK
-  	let line = await this.getLine({
-      leagueId,
-      sportId,
-      handicap,
-      oddsFormat,
-      eventId,
-      periodNumber,
-      betType,
-      team,
-      side
-    });
-    console.error("line", line);
-    let bets, {minRiskStake, minWinStake, price, status, lineId, altLineId} = line;
-    if(status == "SUCCESS"){
-      bets = await this.placeBet({
-        uniqueRequestId: uuid.v4(),
-        sportId,
-        lineId,
-        eventId,
-        periodNumber,
-        stake: minRiskStake,
-        winRiskStake,
-        betType,
-        oddsFormat: oddsFormat.toUpperCase(),
-        team: team ? team.toUpperCase() : undefined,
-        side,
-        altLineId,
-        acceptBetterLine: true,
-        fillType: "NORMAL",
-        pitcher1MustStart: true,
-        pitcher2MustStart: true
-      })
-      console.error("bet", bets);
-      if(bets.status == "ACCEPTED"){
-        let result = await this.getBets({betIds:bets.straightBet.betId});
-        console.error("result", result);
-      }
-    }
-  }
+  // async minBet({sportId, eventId, betType, team, side, periodNumber, handicap}){
+  //   let data = await this.getEvents({sportId, eventIds:eventId});
+  //   console.error("event", data);
+  //   if(!data){
+  //     console.error("loading event fail");
+  //     return;
+  //   }
+  //
+  //   if(data.code){
+  //     console.error(data);
+  //     return;
+  //   }
+  //
+  // 	let leagueId = data.league[0].id;
+  // 	let starts = data.league[0].events[0].starts;
+  //
+  //   console.error({leagueId});
+  //
+  // 	let toDate = "";
+  //   //let periodNumber = 0;
+  //   //let betType = "MONEYLINE";
+  //   let oddsFormat = "Decimal";
+  //   //let handicap = null;
+  //   //let team = "Team2";
+  //   //let side = null;
+  //   //let stake = 1;
+  //   let winRiskStake = "RISK";//WIN, RISK
+  // 	let line = await this.getLine({
+  //     leagueId,
+  //     sportId,
+  //     handicap,
+  //     oddsFormat,
+  //     eventId,
+  //     periodNumber,
+  //     betType,
+  //     team,
+  //     side
+  //   });
+  //   console.error("line", line);
+  //   let bets, {minRiskStake, minWinStake, price, status, lineId, altLineId} = line;
+  //   if(status == "SUCCESS"){
+  //     bets = await this.placeBet({
+  //       uniqueRequestId: uuid.v4(),
+  //       sportId,
+  //       lineId,
+  //       eventId,
+  //       periodNumber,
+  //       stake: minRiskStake,
+  //       winRiskStake,
+  //       betType,
+  //       oddsFormat: oddsFormat.toUpperCase(),
+  //       team: team ? team.toUpperCase() : undefined,
+  //       side,
+  //       altLineId,
+  //       acceptBetterLine: true,
+  //       fillType: "NORMAL",
+  //       pitcher1MustStart: true,
+  //       pitcher2MustStart: true
+  //     })
+  //     console.error("bet", bets);
+  //     if(bets.status == "ACCEPTED"){
+  //       let result = await this.getBets({betIds:bets.straightBet.betId});
+  //       console.error("result", result);
+  //     }
+  //   }
+  // }
 }

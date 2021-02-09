@@ -2,11 +2,28 @@ const axios = require('axios');
 const appDataPath = require('appdata-path')();
 const FileStore = require("file-store");
 const store = FileStore(appDataPath + "\\id.yb");
+const {execSync} = require('child_process');
 const fs = require('fs');
 const fsp = fs.promises;
 
 module.exports = {
   appDataPath,
+
+  getScreenSize(){
+    var cmd = 'wmic path Win32_VideoController get CurrentHorizontalResolution,CurrentVerticalResolution';
+    try{
+      var t = execSync(cmd).toString().match(/\d+/g).map(parseFloat);
+      if(t){
+        return {
+          width: t[0],
+          height: t[1]
+        }
+      }
+    }catch(e){
+      return;
+    }
+  },
+
   getParamString(paramObj){
     return Object.keys(paramObj).map(key=>{
       return key+'='+paramObj[key];

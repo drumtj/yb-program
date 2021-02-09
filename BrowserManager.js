@@ -1,6 +1,7 @@
 const {v4:uuidv4} = require('uuid');
 const chromeOpen = require('./chrome');
 const {LOCAL_MAIN_URL} = require('./config');
+const luminati = require('./luminatiAPI');
 // const api = require('./api');
 const API = require('./api');
 let api;
@@ -8,6 +9,7 @@ const {getParamString} = require('./util');
 let EMAIL;
 
 var browsers = {};
+let chromePath;
 Object.defineProperty(browsers, "kill", {
   value: function(){
     Object.keys(this).forEach(bid=>{
@@ -33,12 +35,30 @@ function getBrowsers(){
   return browsers;
 }
 
-async function openBrowser(bid, browserData){
+async function openBrowser(bid, browserData, index){
   // let bid = browserData._id;
-  console.log("브라우져 열기", bid);
+  console.log("open browser", bid);
   if(browsers[bid]){
-    console.error(bid, "이미 열려있는 브라우져");
+    console.error(bid, "Browser already open");
     return;
+  }
+
+  let balance = await luminati.balance();
+  // console.log("balance", balance);
+  if(!balance.status == 'fail'){
+    console.error("[PROXY] " + balance.message);
+    return {
+      status: "fail",
+      message: "[PROXY] " + balance.message
+    };
+  }
+
+  if(balance.data.balance - balance.data.pending_costs <= 0){
+    console.error("[PROXY] need more balance. luminati API");
+    return {
+      status: "fail",
+      message: "[PROXY] need more balance. luminati API"
+    };
   }
 
   // let browserInfo = await api.loadBrowser(bid);
@@ -50,9 +70,14 @@ async function openBrowser(bid, browserData){
   let countryCode = browserData.account.country;
   let proxy = await api.getProxy(countryCode);
   if(proxy.status != "success"){
-    console.error(bid, "프록시 정보 가져오기 실패", proxy.message);
-    return;
+    console.error(bid, "proxy loading failure.", proxy.message);
+    return {
+      status: "fail",
+      message: "proxy loading failure." + proxy.message
+    };
   }
+
+
 
   // console.log(browserData.option);
   // console.log(browserData.option.dataType);
@@ -68,11 +93,11 @@ async function openBrowser(bid, browserData){
 
 
 
-  let prc = await chromeOpen(bid, false, LOCAL_MAIN_URL + '?' + paramStr, proxy.data);
+  let prc = await chromeOpen(chromePath, bid, index, false, LOCAL_MAIN_URL + '?' + paramStr, proxy.data);
   let browser = createBrowswerObject(prc, browserData);
   browsers[bid] = browser;
   prc.on('exit', function (code) {
-    console.log('브라우져 종료됨', bid, 'code:' + code);
+    console.log('Browser Closed', bid, 'code:' + code);
     browser.killed = true;
     delete browsers[bid];
     if(typeof listener.onClosed === "function"){
@@ -106,12 +131,13 @@ function createBrowswerObject(prc, browserData){
 
 function closeBrowser(bid){
   if(!browsers[bid]){
-    console.error(bid, "이미 닫힌 브라우져");
-    return;
+    console.error(bid, "Browser already closed");
+    return false;
   }
 
   browsers[bid].kill();
   delete browsers[bid];
+  return true;
 }
 
 function closeBrowserAll(){
@@ -119,18 +145,28 @@ function closeBrowserAll(){
 }
 
 async function getLivingBrowsers(){
-  let r = {};
-  for(let bid in browsers){
-    r[bid] = await emitPromise(bid, "getState");
-  }
-  return r;
+  // let r = {};
+  // for(let bid in browsers){
+  //   r[bid] = await emitPromise(bid, "getState", null, 1000);
+  // }
+  // return r;
+  let promises = [];
+  let bids = [];
+  Object.keys(browsers).forEach(bid=>{
+    bids.push(bid);
+    promises.push(emitPromise(bid, "getState", null, 2000));
+  })
+  let results = await Promise.all(promises);
+  // console.log("getLivingBrowsers results", results)
+  let r = results.reduce((r,v,i)=>{
+    r[bids[i]] = v;
+    return r;
+  }, {})
 
-  // return Object.keys(browsers).reduce(async (r,v)=>{
-  //   // emit(v, "test", null);
-  //   let state = await emitPromise(v, "getState");
-  //   r[v] = state;
-  //   return r;
-  // }, {})
+  // console.log("r", r);
+
+  return r;
+  // emitPromise(bid, "getState", null, 1000);
 
   // return Object.keys(browsers);
 
@@ -150,6 +186,8 @@ function setSocket(bid, socket){
   browsers[bid].socket = socket;
 
   socket.on("resolve", (data, uuid)=>{
+    // console.log("resolve", data, uuid);
+    // console.log("has resolve", resolveList[uuid]);
     if(resolveList[uuid]){
       resolveList[uuid](data);
       delete resolveList[uuid];
@@ -187,13 +225,23 @@ function emitAll(event, data){
   getSocket().forEach(socket=>socket.emit(event, data))
 }
 
-function emitPromise(bid, event, data){
+function emitPromise(bid, event, data, timeout=0){
   let socket = getSocket(bid);
   if(socket){
     let id = uuidv4();
     socket.emit(event, data, id);
     return new Promise(resolve=>{
-      resolveList[id] = resolve;
+      let itv;
+      if(timeout>0){
+        itv = setTimeout(()=>{
+          delete resolveList[id];
+          resolve();
+        }, timeout)
+      }
+      resolveList[id] = (d)=>{
+        clearTimeout(itv);
+        resolve(d);
+      }
     })
   }else{
     return Promise.resolve();
@@ -249,12 +297,17 @@ function leave(bid, room){
   }
 }
 
+function setChromePath(path){
+  chromePath = path;
+}
+
 module.exports = {
   emitTo,
   leave,
   join,
   setIO,
   setEmail,
+  setChromePath,
   getBrowser,
   getBrowsers,
   openBrowser,

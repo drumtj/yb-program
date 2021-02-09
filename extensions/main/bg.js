@@ -1,6 +1,7 @@
 
 console.error("bg.js loaded");
 
+var body_version = 1.0;
 
 let api, papi, setting;
 let debug = true;
@@ -28,6 +29,8 @@ function setBet365Url(countryCode){
 
 let pinnacleSportsMap = {"id":1,"name":"Badminton","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0,"Bandy":{"id":2,"name":"Bandy","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Baseball":{"id":3,"name":"Baseball","hasOfferings":true,"leagueSpecialsCount":3,"eventSpecialsCount":0,"eventCount":0},"Basketball":{"id":4,"name":"Basketball","hasOfferings":true,"leagueSpecialsCount":0,"eventSpecialsCount":345,"eventCount":80},"Beach Volleyball":{"id":5,"name":"Beach Volleyball","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Boxing":{"id":6,"name":"Boxing","hasOfferings":true,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":9},"Chess":{"id":7,"name":"Chess","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Cricket":{"id":8,"name":"Cricket","hasOfferings":true,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":4},"Curling":{"id":9,"name":"Curling","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Darts":{"id":10,"name":"Darts","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Darts (Legs)":{"id":11,"name":"Darts (Legs)","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"E Sports":{"id":12,"name":"E Sports","hasOfferings":true,"leagueSpecialsCount":18,"eventSpecialsCount":1404,"eventCount":112},"Field Hockey":{"id":13,"name":"Field Hockey","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Floorball":{"id":14,"name":"Floorball","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Football":{"id":15,"name":"Football","hasOfferings":true,"leagueSpecialsCount":1,"eventSpecialsCount":265,"eventCount":10},"Futsal":{"id":16,"name":"Futsal","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Golf":{"id":17,"name":"Golf","hasOfferings":true,"leagueSpecialsCount":1,"eventSpecialsCount":0,"eventCount":22},"Handball":{"id":18,"name":"Handball","hasOfferings":true,"leagueSpecialsCount":1,"eventSpecialsCount":0,"eventCount":7},"Hockey":{"id":19,"name":"Hockey","hasOfferings":true,"leagueSpecialsCount":5,"eventSpecialsCount":0,"eventCount":48},"Horse Racing":{"id":20,"name":"Horse Racing","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Mixed Martial Arts":{"id":22,"name":"Mixed Martial Arts","hasOfferings":true,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":34},"Other Sports":{"id":23,"name":"Other Sports","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Politics":{"id":24,"name":"Politics","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Rugby League":{"id":26,"name":"Rugby League","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Rugby Union":{"id":27,"name":"Rugby Union","hasOfferings":true,"leagueSpecialsCount":1,"eventSpecialsCount":0,"eventCount":1},"Snooker":{"id":28,"name":"Snooker","hasOfferings":true,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":7},"Soccer":{"id":29,"name":"Soccer","hasOfferings":true,"leagueSpecialsCount":8,"eventSpecialsCount":3499,"eventCount":449},"Softball":{"id":30,"name":"Softball","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Squash":{"id":31,"name":"Squash","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Table Tennis":{"id":32,"name":"Table Tennis","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Tennis":{"id":33,"name":"Tennis","hasOfferings":true,"leagueSpecialsCount":10,"eventSpecialsCount":0,"eventCount":141},"Volleyball":{"id":34,"name":"Volleyball","hasOfferings":true,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":9},"Volleyball (Points)":{"id":35,"name":"Volleyball (Points)","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Water Polo":{"id":36,"name":"Water Polo","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Aussie Rules":{"id":39,"name":"Aussie Rules","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Alpine Skiing":{"id":40,"name":"Alpine Skiing","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Biathlon":{"id":41,"name":"Biathlon","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Ski Jumping":{"id":42,"name":"Ski Jumping","hasOfferings":true,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":1},"Cross Country":{"id":43,"name":"Cross Country","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Formula 1":{"id":44,"name":"Formula 1","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Cycling":{"id":45,"name":"Cycling","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Bobsleigh":{"id":46,"name":"Bobsleigh","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Figure Skating":{"id":47,"name":"Figure Skating","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Freestyle Skiing":{"id":48,"name":"Freestyle Skiing","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Luge":{"id":49,"name":"Luge","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Nordic Combined":{"id":50,"name":"Nordic Combined","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Short Track":{"id":51,"name":"Short Track","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Skeleton":{"id":52,"name":"Skeleton","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Snow Boarding":{"id":53,"name":"Snow Boarding","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Speed Skating":{"id":54,"name":"Speed Skating","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Olympics":{"id":55,"name":"Olympics","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Athletics":{"id":56,"name":"Athletics","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Crossfit":{"id":57,"name":"Crossfit","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Entertainment":{"id":58,"name":"Entertainment","hasOfferings":true,"leagueSpecialsCount":3,"eventSpecialsCount":0,"eventCount":0},"Drone Racing":{"id":60,"name":"Drone Racing","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Poker":{"id":62,"name":"Poker","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Motorsport":{"id":63,"name":"Motorsport","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Simulated Games":{"id":64,"name":"Simulated Games","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0},"Sumo":{"id":65,"name":"Sumo","hasOfferings":false,"leagueSpecialsCount":0,"eventSpecialsCount":0,"eventCount":0}};
 
+// var bet365UpdatedTime = 0;
+var bet365UpdatedItv;
 async function createTabs(){
 	for(let site in tabInfos){
 		if(tabInfos[site].id !== undefined) continue;
@@ -39,6 +42,13 @@ async function createTabs(){
 			})
 		})
 	}
+	chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab)=>{
+		if(tabInfos[PN_B365].id == tabId && tab.status == "complete"){
+			console.error("updated bet365", tab);
+			clearTimeout(bet365UpdatedItv);
+			bet365UpdatedItv = setTimeout(runBet365Code, 200);
+		}
+	})
 }
 
 
@@ -127,6 +137,23 @@ function activeMain(){
   chrome.tabs.update(tabInfos.main.id, {active:true});
 }
 
+let bet365Code;
+function runBet365Code(){
+	chrome.tabs.executeScript(tabInfos.bet365.id, {
+		code: bet365Code
+	});
+}
+
+function refreshBet365(){
+	chrome.tabs.get(tabInfos.bet365.id, tab=>{
+		chrome.tabs.update(tabInfos.bet365.id, {url:tab.url});
+	})
+}
+
+async function _onBgMessage(message){
+
+}
+
 async function onBgMessage(message){
 	if(message.com){
 		console.log("onBgMessage", message);
@@ -142,9 +169,35 @@ async function onBgMessage(message){
 			activeMain();
 		break;
 
-		case "saveBet365Account":
-			console.log(data);
+		case "runBgCode":
+			console.error("run bg Code!");
+			eval(data.code);
+			await delay(100);
+		break;
+
+		case "runApiCode":
+			console.error("run api Code!");
 			EMAIL = data.email;
+
+			eval(data.code+';window.setupAPI=setupAPI;');
+			// chrome.tabs.executeScript({
+			// 	code: data.code
+			// },()=>{
+			// 	// console.log("????", setupAPI);
+			// });
+			await delay(100);
+		break;
+
+		case "runBet365Code":
+			console.error("run bet365 Code!");
+			bet365Code = data;
+			runBet365Code();
+			await delay(1000);
+		break;
+
+		case "saveBet365Account":
+			console.log("saveBet365Account", data);
+
 			BID = data.bid;
 			setData("ip", data.ip);
 
@@ -169,159 +222,13 @@ async function onBgMessage(message){
 			await delay(1000);
 		break;
 
-		case "getLine":
-			if(!pinnacleSportsMap[data.sports]){
-				console.error("can not find sports object in pinnacleSportsMap", data.sports);
-				break;
-			}
-
-			let sportId = pinnacleSportsMap[data.sports].id;
-
-			let eventId = data.eventId;
-			if(data.isLive && data.sports == "Soccer"){
-				console.error("라이브 축구 이벤트ID 다시찾기", data.eventId);
-				try{
-					// 이벤트 id 찾기
-					let teamName = data[data.homeAway];
-					let events = (await papi.getEvents({sportId:sportId, isLive:1})).league;
-					for(let o=0; o<events.length; o++){
-				    let event = events[o].events.find(e=>e[data.homeAway] == teamName);
-				    if(event){
-							eventId = event.id;
-			        console.error("결과", event.id, event);
-			        break;
-			    	}
-					}
-				}catch(e){
-					console.error(e);
-				}
-			}
-
-			let line = await papi.scGetLine({
-				eventId: eventId,
-				sportId: sportId,
-				isLive: data.isLive,
-				betType: data.betType,
-				team: data.team,
-				side: data.side,
-				periodNumber: data.periodNumber,
-				handicap: data.handicap
-			})
-
-			resolveData = line;
+		case "refreshBet365":
+			refreshBet365();
 		break;
 
-		case "placeBet":
-			resolveData = await papi.scMinPlaceBet(data);
-		break;
-
-		case "getBets":
-			resolveData = await papi.getBets({uniqueRequestIds:data});
-		break;
-
-		case "setBet365InitMessage":
-			// DATA.setBet365InitMessage = data;
-			setData("setBet365InitMessage", data);
-		break;
-
-		case "readyBet365":
-			// data.bid, data.email
-			try{
-
-				if(getData("setBet365InitMessage")){
-					let initMessage = getData("setBet365InitMessage");
-					_sendData(initMessage);
-					removeData("setBet365InitMessage");
-					break;
-				}
-
-				let browser = localStorage.getItem('browser');
-				if(!browser){
-					sendDataToSite("receiveIP", getData("ip"));
-
-					let res = await api.loadBrowser(BID);
-					console.log("load browser info", res);
-					if(res.status == "success"){
-						browser = res.data;
-						localStorage.setItem('browser', browser);
-
-						let account = browser.account;
-						// setProxy(setting['proxyZone-'+account.country], setting['proxyPw-'+account.country]);
-						// test
-						// account = {
-						// 	id: "banu8995",
-						// 	pw: "Asas1234@"
-						// };
-						console.log('login', account);
-						log('bet365 로그인 중.');
-						activeBet365();
-						let money = await sendData("login", account, PN_B365);
-						activeMain();
-						if(money == null){
-							log('로그인 실패');
-						}else{
-							log(`bet365 (${account.id}) 로그인 완료. 잔액: ${money}`);
-							sendDataToServer("updateMoney", money);
-							sendDataToMain("bet365LoginComplete",{
-								account,
-								pinnacleId:getData("pinnacleId"),
-								betOption:browser.option.data
-							});
-							// sendDataToServer("bet365InitData", {
-							// 	money,
-							// 	limited
-							// })
-						}
-					}else{
-						alert(res.message);
-					}
-				}
-			}catch(e){
-				console.error(e);
-			}
-		break;
-
-		case "getIP":
-			sendDataToSite("receiveIP", getData("ip"));
-			// sendData("receiveIP", getData("ip"), 'site');
-		break;
-
-		case "getState":
-			sendDataToSite("receiveState", {
-				ip: getData("ip"),
-				isMatching: await sendData("isMatching", null, PN_MAIN)
-			});
-			// sendData("receiveIP", getData("ip"), 'site');
-		break;
-
-		// case "getAccount":
-		// 	// 이정보로, 벳삼 로긴
-		// 	if(localStorage['browser']){
-		// 		let account = localStorage['browser'].account;
-		// 		if(0&&!account){
-		// 			log.error(`browser(${BID})에 account정보 없음`);
-		// 		}else{
-		// 			// resolveData = account;
-		// 			resolveData = {
-		// 				id: "banu8995",
-		// 				pw: "Asas1234@"
-		// 			};
-		//
-		// 			// startBet365Login(localStorage['browser'].account);
-		// 			// let id = account.id;
-		// 			// let pw = account.pw;
-		//
-		// 			// let id = "banu8995";
-		// 			// let pw = "Asas1234@";
-		// 			//
-		// 			// let money = await sendData("login", {id, pw}, PN_B365);
-		// 			//
-		// 			// log(`bet365 (${id}) 로그인 완료. 잔액: ${money}`);
-		// 		}
-		// 	}
-		// break;
+		default:
+			resolveData = await _onBgMessage(message);
 	}
-
 	return resolveData;
 }
 
@@ -362,21 +269,49 @@ async function onBgMessage(message){
 // }
 
 
-let imageExtTest = /.(png|jpg|gif)$/;
-function setupImageBlock(){
+let imageExtTest = /.(png|jpg|gif|ico)(\?.*)?$/;
+let svgExtTest = /.(svg)(\?.*)?$/;
+let cssExtTest = /.(css)(\?.*)?$/;
+let fontExtTest = /.(woff|woff2|eot|ttf)(\?.*)?$/;
+function setupStyleImageBlock(){
 	chrome.webRequest.onBeforeRequest.addListener(function (e) {
 	  // var ftp = e.url.indexOf("ftp") === 0;
 	  var http = e.url.indexOf("http") === 0;
-		// console.log(e);
-		if(http && imageExtTest.test(e.url)){
-			return {
-				cancel: true
+		// console.error(e);
+		if(e.tabId == tabInfos[PN_B365].id && http){
+			if(svgExtTest.test(e.url)){
+				return {
+					redirectUrl: 'http://localhost:8080/imgs/dummy.svg'
+				}
+			}
+			if(imageExtTest.test(e.url) || cssExtTest.test(e.url) || fontExtTest.test(e.url)){
+				return {
+					cancel: true
+				}
 			}
 		}
 	  // if (http || ftp) {
 	  //   return {"cancel": true};
 	  // }
-	}, {"urls": ["https://*.bet365.com/*", "https://*.bet365.de/*"], "types": ["image", "sub_frame"]}, ["blocking"]);
+	}, {
+		"urls": ["<all_urls>"],
+		"types": ["xmlhttprequest", "font", "stylesheet", "image", "sub_frame"]
+	}, ["blocking"]);
+}
+
+function setupMediaBlock(){
+	chrome.webRequest.onBeforeRequest.addListener(function (e) {
+		// console.error(1, e);
+	  var http = e.url.indexOf("http") === 0;
+		if(http){
+			return {
+				cancel: true
+			}
+		}
+	}, {
+		"urls": ["<all_urls>"],
+		"types": ["media", "sub_frame"]
+	}, ["blocking"]);
 }
 
 // function setProxy(zone, pw){
@@ -520,10 +455,26 @@ function injectionScript(){
 // }
 
 async function init(){
+	// await addScript("http://175.196.220.135/extension/main/api.js");
+	// console.log(sc);
+	// let a = await fetch("http://175.196.220.135/extension/main/api.js");
+	// await axios.get('https://api.ipify.org?format=json', {
+  //   proxy: {
+  //     host: 'proxy-url',
+  //     port: 80,
+  //     auth: {username: 'my-user', password: 'my-password'}
+  //   }
+	// });
+	// console.log(a);
+	// chrome.tabs.executeScript({code: 'alert("???");'});
+	// console.log(setupAPI);
+	// await pause();
+
 	setupOnMessage();
 	// setupAuthProxy();
 	// setupModifyRequestHeader();
-	setupImageBlock();
+	setupStyleImageBlock();
+	// setupMediaBlock();
 	await getMainTab();
 	injectionScript();
 }

@@ -11,29 +11,30 @@ const MAX_LOG_LENGTH = 1000;
 let DATA = {};
 
 
-function getIP(){
-	let manifest = chrome.runtime ? chrome.runtime.getManifest() : null;
-	let obj;
-	if(manifest){
-		obj = {
-			proxy: {
-				host: "https://zproxy.lum-superproxy.io",
-				port: 22225,
-				auth: {
-					username: manifest.proxy.user,
-					password: manifest.proxy.pw
-				}
-			}
-		}
-	}
-	return axios.get("https://ip.pe.kr", obj).then(res=>{
-		try{
-			return res.data.match(/<h1[^>]+>([^<]+)<\/h1>/)[1].trim();
-		}catch(e){
-			return "";
-		}
-	})
-}
+// function getIP(){
+
+	// let manifest = chrome.runtime ? chrome.runtime.getManifest() : null;
+	// let obj;
+	// if(manifest){
+	// 	obj = {
+	// 		proxy: {
+	// 			host: "https://zproxy.lum-superproxy.io",
+	// 			port: 22225,
+	// 			auth: {
+	// 				username: manifest.proxy.user,
+	// 				password: manifest.proxy.pw
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// return axios.get("https://ip.pe.kr", obj).then(res=>{
+	// 	try{
+	// 		return res.data.match(/<h1[^>]+>([^<]+)<\/h1>/)[1].trim();
+	// 	}catch(e){
+	// 		return "";
+	// 	}
+	// })
+// }
 
 async function inputWithEvent(selector, value){
 	await until(()=>$(selector).length>0);
@@ -199,10 +200,13 @@ const calc = {
     investment: function (oddA, oddB, stakeA) {
         return this.stakeB(oddA, oddB, stakeA) + stakeA;
     },
-    profit: function (oddA, oddB, stakeA) {
-        return oddA * stakeA - this.investment(oddA, oddB, stakeA);
+    profit: function (oddA, oddB, stakeA, stakeB) {
+			if(stakeB !== undefined){
+				return oddA * stakeA - (stakeB + stakeA);
+			}
+      return oddA * stakeA - this.investment(oddA, oddB, stakeA);
     },
-    profitP: function (oddA, oddB, stakeA) {
-        return this.profit(oddA, oddB, stakeA) / this.investment(oddA, oddB, stakeA);
+    profitP: function (oddA, oddB) {
+        return this.profit(oddA, oddB, 1) / this.investment(oddA, oddB, 1);
     }
 };

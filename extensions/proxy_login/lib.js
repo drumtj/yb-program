@@ -3,7 +3,7 @@
  * It's supposed to be included everywhere (bg, options, etc.).
  */
  var manifest = chrome.runtime.getManifest();
- console.error({manifest});
+ // console.error({manifest});
  localStorage["proxy_login"] = manifest.proxy.user;
  localStorage["proxy_password"] = manifest.proxy.pw;
 

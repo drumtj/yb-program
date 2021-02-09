@@ -7,6 +7,9 @@
   %1: C:\work\yb-program\public\main.html
   %2: C:\work\yb-program\package.json
 > [debug] Content of %1 is added to queue. It was required from %2
+  %1: C:\work\yb-program\public\imgs\dummy.svg
+  %2: C:\work\yb-program\package.json
+> [debug] Content of %1 is added to queue. It was required from %2
   %1: C:\work\yb-program\public\socket.io\socket.io.js
   %2: C:\work\yb-program\package.json
 > [debug] Content of %1 is added to queue. It was required from %2
@@ -194,9 +197,6 @@
 > [debug] Bytecode of %1 is added to queue. It was required from %2
   %1: C:\work\yb-program\api.js
   %2: C:\work\yb-program\index.js
-> [debug] Bytecode of %1 is added to queue. It was required from %2
-  %1: C:\work\yb-program\chrome.js
-  %2: C:\work\yb-program\index.js
 > [debug] Content of %1 is added to queue. It was required from %2
   %1: C:\work\yb-program\node_modules\express\package.json
   %2: C:\work\yb-program\index.js
@@ -213,6 +213,12 @@
   %1: C:\work\yb-program\node_modules\uuid\dist\index.js
   %2: C:\work\yb-program\index.js
 > [debug] Content of %1 is added to queue. It was required from %2
+  %1: C:\work\yb-program\node_modules\cors\package.json
+  %2: C:\work\yb-program\index.js
+> [debug] Bytecode of %1 is added to queue. It was required from %2
+  %1: C:\work\yb-program\node_modules\cors\lib\index.js
+  %2: C:\work\yb-program\index.js
+> [debug] Content of %1 is added to queue. It was required from %2
   %1: C:\work\yb-program\node_modules\socket.io\package.json
   %2: C:\work\yb-program\index.js
 > [debug] Bytecode of %1 is added to queue. It was required from %2
@@ -222,6 +228,8 @@
   %1: C:\work\yb-program
 > [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\public\main.html
+> [debug] Stat info of %1 is added to queue
+  %1: C:\work\yb-program\public\imgs\dummy.svg
 > [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\public\socket.io\socket.io.js
 > [debug] Stat info of %1 is added to queue
@@ -2553,16 +2561,6 @@
   %1: C:\work\yb-program\config.js
   %2: C:\work\yb-program\api.js
 > [debug] Stat info of %1 is added to queue
-  %1: C:\work\yb-program\chrome.js
-> [debug] Content of %1 is added to queue
-  %1: C:\work\yb-program\chrome.js
-> [debug] Bytecode of %1 is added to queue. It was required from %2
-  %1: C:\work\yb-program\util.js
-  %2: C:\work\yb-program\chrome.js
-> [debug] Bytecode of %1 is added to queue. It was required from %2
-  %1: C:\work\yb-program\config.js
-  %2: C:\work\yb-program\chrome.js
-> [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\BrowserManager.js
 > [debug] Content of %1 is added to queue
   %1: C:\work\yb-program\BrowserManager.js
@@ -2579,6 +2577,9 @@
   %1: C:\work\yb-program\config.js
   %2: C:\work\yb-program\BrowserManager.js
 > [debug] Bytecode of %1 is added to queue. It was required from %2
+  %1: C:\work\yb-program\luminatiAPI.js
+  %2: C:\work\yb-program\BrowserManager.js
+> [debug] Bytecode of %1 is added to queue. It was required from %2
   %1: C:\work\yb-program\api.js
   %2: C:\work\yb-program\BrowserManager.js
 > [debug] Bytecode of %1 is added to queue. It was required from %2
@@ -2588,6 +2589,8 @@
   %1: C:\work\yb-program
 > [debug] Directory %1 is added to queue
   %1: C:\work\yb-program\public
+> [debug] Directory %1 is added to queue
+  %1: C:\work\yb-program\public\imgs
 > [debug] Directory %1 is added to queue
   %1: C:\work\yb-program\public\socket.io
 > [debug] Directory %1 is added to queue
@@ -7467,10 +7470,22 @@
   %1: C:\work\yb-program\user.json
 > [debug] Content of %1 is added to queue
   %1: C:\work\yb-program\user.json
+> [debug] Stat info of %1 is added to queue
+  %1: C:\work\yb-program\chrome.js
+> [debug] Content of %1 is added to queue
+  %1: C:\work\yb-program\chrome.js
+> [debug] Bytecode of %1 is added to queue. It was required from %2
+  %1: C:\work\yb-program\util.js
+  %2: C:\work\yb-program\chrome.js
+> [debug] Bytecode of %1 is added to queue. It was required from %2
+  %1: C:\work\yb-program\config.js
+  %2: C:\work\yb-program\chrome.js
 > [debug] Directory %1 is added to queue
   %1: C:\work
 > [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\public
+> [debug] Stat info of %1 is added to queue
+  %1: C:\work\yb-program\public\imgs
 > [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\public\socket.io
 > [debug] Stat info of %1 is added to queue
@@ -11137,6 +11152,8 @@
   %1: C:\work
 > [debug] Directory %1 is added to queue
   %1: C:\work\yb-program
+> [debug] Directory %1 is added to queue
+  %1: C:\work\yb-program\public
 > [debug] Directory %1 is added to queue
   %1: C:\work\yb-program\public
 > [debug] Directory %1 is added to queue
@@ -15660,6 +15677,8 @@
   C:\work\yb-program\index.js
 > [debug] The file was included as asset content
   C:\work\yb-program\public\main.html
+> [debug] The file was included as asset content
+  C:\work\yb-program\public\imgs\dummy.svg
 > [debug] The file was included as DISCLOSED code (with sources)
   C:\work\yb-program\public\socket.io\socket.io.js
 > [debug] The file was included as DISCLOSED code (with sources)
@@ -16144,8 +16163,10 @@
   C:\work\yb-program\node_modules\uuid\wrapper.mjs
 > [debug] The file was included as DISCLOSED code (with sources)
   C:\work\yb-program\user.json
-> [debug] The directory files list was included (2 items)
+> [debug] The directory files list was included (3 items)
   C:\work\yb-program\public
+> [debug] The directory files list was included (1 item)
+  C:\work\yb-program\public\imgs
 > [debug] The directory files list was included (1 item)
   C:\work\yb-program\public\socket.io
 > [debug] The directory files list was included (2 items)

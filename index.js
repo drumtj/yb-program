@@ -6,14 +6,16 @@ const util = require('./util');
 const luminati = require('./luminatiAPI');
 const API = require('./api');
 var api;
-const chromeOpen = require('./chrome');
+// const chromeOpen = require('./chrome');
 const http = require('http');
 const express = require("express");
 const path = require("path");
 const BrowserManager = require("./BrowserManager");
 // const napi = require("./napi");
 const {v4:uuidv4} = require('uuid');
-// const cors = require('cors');
+const cors = require('cors');
+// const download = require('download-chromium');
+// const fs = require('fs');
 
 let pid, pdata, io, socket;
 
@@ -21,13 +23,13 @@ let pid, pdata, io, socket;
 
 async function proxySetup(){
   if(!config.USE_PROXY){
-    console.log("[PROXY] 프록시 사용안함 설정됨.");
+    console.log("[PROXY] disabled.");
     return true;
   }
 
   let proxy = await api.getProxy();
   if(proxy.status != "success"){
-    console.error(bid, "프록시 정보 가져오기 실패", proxy.message);
+    console.error(bid, "proxy loading failure.", proxy.message);
     return;
   }
   //
@@ -44,7 +46,8 @@ async function proxySetup(){
     proxyInfo[proxy.data[countryCode].zone] = proxy.data[countryCode];
   }
 
-  console.log({proxyInfo});
+  console.log("proxy info loaded");
+  // console.log({proxyInfo});
 
   let balance = await luminati.balance();
   // console.log("balance", balance);
@@ -53,14 +56,14 @@ async function proxySetup(){
     return false;
   }
 
-  if(balance.data.balance <= 0){
-    console.error("[PROXY] need more balance");
+  if(balance.data.balance - balance.data.pending_costs <= 0){
+    console.error("[PROXY] need more balance. luminati API");
     return false;
   }
 
   // let ips = (await luminati.getIPs()).data[config.PROXY_ZONE];
   let ips = (await luminati.getIPs('*'));
-  console.log("ips", ips);
+  console.log("ip zone loaded");
 
   if(ips.status != "success"){
     console.error("luminati get ips error");
@@ -97,22 +100,35 @@ async function proxySetup(){
 
 var EMAIL;
 
+function getInDataGroup(){
+  let r = [];
+  if(socketGroups["gamedata"] && Object.keys(socketGroups["gamedata"]).length){
+    r.push("__data_receiver__");
+  }
+  if(socketGroups["gamedata2"] && Object.keys(socketGroups["gamedata2"]).length){
+    r.push("__data_receiver2__");
+  }
+  return r;
+}
+
 function socketSetup(setupSocketEvent){
   return new Promise((resolve, reject)=>{
     let socket = ioClient(config.SOCKET_URL, { transports: ['websocket'] });
     socket.on("connect", async ()=>{
-      console.log("소켓 연결완료");
-      socket.emit("init", {link:"__program__", pid:(await util.getData("PID"))});//, email:config.EMAIL});
+      console.log("socket connected!");
+      socketGroups
+      socket.emit("init", {link:"__program__", pid:(await util.getData("PID")), groups:getInDataGroup()});//, email:config.EMAIL});
 
     })
     socket.on("email", data=>{
-      console.error("receive email", data);
+      // console.error("receive email", data);
       if(!data){
         reject();
         return;
       }
       EMAIL = data;
       BrowserManager.setEmail(data);
+      BrowserManager.setChromePath(chromeIntallPath);
       api = API(data);
       resolve(socket);
     })
@@ -167,10 +183,10 @@ async function keySetup(){
   }
 
   if(pid){
-    console.log("프로그램 ID 인증 완료");
+    console.log("Program ID authentication completed");
     await util.setData("PID", pid);
   }else{
-    console.log("프로그램 ID 인증 실패");
+    console.log("Program ID authentication failure");
     await util.setData("PID", '');
   }
 
@@ -178,10 +194,10 @@ async function keySetup(){
 }
 
 async function loadInfo(pid){
-  console.log("프로그램 정보 로드");
+  console.log("programs info loading..");
   let res = await api.loadProgram(pid);
   if(res.status == 'fail'){
-    console.error("프로그램 정보 로드 실패");
+    console.error("program info loading failure");
     return;
   }
 
@@ -201,7 +217,7 @@ function localSocketServerSetup(setupSocketEvent){
     socket.on("initMainPage", data=>{
       BrowserManager.setIO(io);
       BrowserManager.setSocket(data.bid, socket);
-      console.log("브라우져 연결", data.bid, data);
+      console.log("connect to browser:", data.bid, data);
       //BrowserManager.emit(data.bid, )
       // if(data.isChecker){
       //   chekerBid = data.bid;
@@ -216,7 +232,7 @@ function localSocketServerSetup(setupSocketEvent){
   // console.log(path.join(process.cwd(), "public"));
   // app.use(express.static("public"));
   app.use('/', express.static(path.join(__dirname, "public")));
-  // app.use(cors());
+  app.use(cors());
   // app.use('/socket.io', express.static(path.join(__dirname, "public/socket.io")));
   // app.use(express.static(path.join(process.cwd(), "public")));
 
@@ -282,12 +298,29 @@ async function sendBrowserState(){
 }
 
 let socketGroups = {};
+let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
 
 (async ()=>{
 
+  // let chromeFolder = `${process.cwd()}/chromium`;
+  // console.log("start download");
+  // chromeIntallPath = await download({
+  //   // platform = currentPlatform,
+  //   // revision = '499413',
+  //   log: true,
+  //   onProgress: (obj)=>{
+  //     let {percent, transferred, total} = obj;
+  //     console.log(percent, transferred, total);
+  //   },
+  //   installPath: chromeFolder
+  // })
+  // // const exec = await download();
+  // console.log(`Downloaded Chromium to ${chromeIntallPath}`);
+  // console.log(`chromePath: ${chromePath}`);
+
   pid = await inputPid();
 
-  console.log("소켓연결중");
+  console.log("socket connecting...");
   // 사이트와 프로그램이 통신하는 부분
   try{
     socket = await socketSetup(socket=>{
@@ -347,7 +380,7 @@ let socketGroups = {};
         // }
       }
 
-      socket.on("openBrowser", (bid, browser)=>{//, isChecker)=>{
+      socket.on("openBrowser", async (bid, browser, index)=>{//, isChecker)=>{
         // console.log({bid, browser})
         // console.log("browser.option", browser.option);
         // let browserInfo = await api.loadBrowser(bid);
@@ -386,7 +419,10 @@ let socketGroups = {};
           if(!socketGroups["gamedata2"]) socketGroups["gamedata2"] = {};
           socketGroups["gamedata2"][bid] = 1;
         }
-        BrowserManager.openBrowser(bid, browser);//{isChecker});
+        let openResult = await BrowserManager.openBrowser(bid, browser, index);//{isChecker});
+        if(openResult && openResult.status == "fail"){
+          socket.emit("log", openResult.message, bid);
+        }
       })
 
       socket.on("closeBrowser", bid=>{
@@ -395,8 +431,12 @@ let socketGroups = {};
         //   // socket.removeAllListeners("gamedata");
         //   socket.off("gamedata");
         // }
-        BrowserManager.closeBrowser(bid);
+        let flag = BrowserManager.closeBrowser(bid);
         leaveDataGroup(bid);
+        if(!flag){
+          // 이미 닫혔다. 서버에 신호는 보내줘야지?
+          emitToSite("closedBrowser", null, bid);
+        }
       })
 
       socket.on("exit", ()=>{
@@ -409,18 +449,20 @@ let socketGroups = {};
         sendBrowserState();
       })
 
+      // socket.on("getConnectionState", ()=>{
+      //   console.error("getConnectionState");
+      //   emitToSite("connectedProgram", pid);
+      // })
 
-      socket.on("test", ()=>{
-        console.log("test");
-      })
+
     });
   }catch(e){
-    console.error("소켓연결 실패. pid 확인");
+    console.error("fail connect to socket. check the pid");
     return;
   }
 
   if(!socket){
-    console.error("socket 연결 실패");
+    console.error("not found socket");
     process.exit();
   }
 

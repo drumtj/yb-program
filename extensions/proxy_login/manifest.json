@@ -1,1 +1,1 @@
-{"background":{"scripts":["lib.js","bg.js"]},"manifest_version":2,"name":"Proxy Auto Auth","permissions":["notifications","webRequest","webRequestBlocking","<all_urls>"],"version":"2.0","proxy":{"zone":"static_res","user":"lum-customer-lee_homin-zone-static_res","pw":"t3hiymu5wv4o"}}
+{"background":{"scripts":["lib.js","bg.js"]},"manifest_version":2,"name":"Proxy Auto Auth","permissions":["notifications","webRequest","webRequestBlocking","<all_urls>"],"version":"2.0","proxy":{"zone":"static_res","user":"lum-customer-c_ae579f57-zone-static_res","pw":"t3hiymu5wv4o"}}
