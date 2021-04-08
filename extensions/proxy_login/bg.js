@@ -28,85 +28,95 @@ var calls = {};
 
 /* Core */
 // console.log("addListener chrome.webRequest.onAuthRequired");
-chrome.webRequest.onAuthRequired.addListener(
-	function(details) {
-		var locked = isLocked();
-		var idstr = details.requestId.toString();
+var manifest = chrome.runtime.getManifest();
 
-		console.error(details);
-		if(details.isProxy === true){// && !locked){
+init2();
 
-			console.log('AUTH - ' + details.requestId);
-			//console.log(JSON.stringify(details));
+function init2(){
+	if(manifest.useCustomProxy){
+		return;
+	}
 
-			console.error({
-				login: localStorage["proxy_login"],
-				pw: localStorage["proxy_password"]
-			});
+	chrome.webRequest.onAuthRequired.addListener(
+		function(details) {
+			var locked = isLocked();
+			var idstr = details.requestId.toString();
 
-			// if(!(idstr in calls)){
-			// 	calls[idstr] = 0;
-			// }
-			// calls[idstr] = calls[idstr] + 1;
+			// console.error(details);
+			if(details.isProxy === true){// && !locked){
 
-			// var retry = parseInt(localStorage["proxy_retry"]) || DEFAULT_RETRY_ATTEMPTS || 5;
+				console.log('AUTH - ' + details.requestId);
+				//console.log(JSON.stringify(details));
 
-			// if(calls[idstr] >= retry){
-			// 	lock();
-			// 	chrome.notifications.create(NOTIFICATION_ID, {
-			// 		'type': 'basic',
-			// 		'iconUrl': 'icon_locked_128.png',
-			// 		'title': 'Proxy Auto Auth error',
-			// 		'message': 'A lot of Proxy Authentication requests have been detected. There is probably a mistake in your credentials. For your safety, the extension has been temporary locked. To unlock it, click the save button in the options.',
-			// 		'isClickable': true,
-			// 		'priority': 2
-			// 	}, function(id){
-			// 		//console.log('notification callback');
-			// 	});
-			// 	calls = {};
-			// 	return({
-			// 		cancel : true
-			// 	});
-			// }
-
-			var login = localStorage["proxy_login"];
-			var password = localStorage["proxy_password"];
-
-			if (login && password){// && !locked){
-				return({
-					authCredentials : {
-						'username' : login,
-						'password' : password
-					}
+				console.error({
+					login: localStorage["proxy_login"],
+					pw: localStorage["proxy_password"]
 				});
+
+				// if(!(idstr in calls)){
+				// 	calls[idstr] = 0;
+				// }
+				// calls[idstr] = calls[idstr] + 1;
+
+				// var retry = parseInt(localStorage["proxy_retry"]) || DEFAULT_RETRY_ATTEMPTS || 5;
+
+				// if(calls[idstr] >= retry){
+				// 	lock();
+				// 	chrome.notifications.create(NOTIFICATION_ID, {
+				// 		'type': 'basic',
+				// 		'iconUrl': 'icon_locked_128.png',
+				// 		'title': 'Proxy Auto Auth error',
+				// 		'message': 'A lot of Proxy Authentication requests have been detected. There is probably a mistake in your credentials. For your safety, the extension has been temporary locked. To unlock it, click the save button in the options.',
+				// 		'isClickable': true,
+				// 		'priority': 2
+				// 	}, function(id){
+				// 		//console.log('notification callback');
+				// 	});
+				// 	calls = {};
+				// 	return({
+				// 		cancel : true
+				// 	});
+				// }
+
+				var login = localStorage["proxy_login"];
+				var password = localStorage["proxy_password"];
+
+				if (login && password){// && !locked){
+					return({
+						authCredentials : {
+							'username' : login,
+							'password' : password
+						}
+					});
+				}
 			}
-		}
-	},
-	{urls: ["<all_urls>"]},
-	["blocking"]
-);
+		},
+		{urls: ["<all_urls>"]},
+		["blocking"]
+	);
 
-/*
-chrome.webRequest.onBeforeSendHeaders.addListener(
-	function(details) {
-		for (var i = 0; i < details.requestHeaders.length; ++i) {
-			if (details.requestHeaders[i].name === 'Proxy-Authorization') {
-				console.log('Proxy-Authorization is set');
-				// details.requestHeaders.splice(i, 1);
-				break;
+	/*
+	chrome.webRequest.onBeforeSendHeaders.addListener(
+		function(details) {
+			for (var i = 0; i < details.requestHeaders.length; ++i) {
+				if (details.requestHeaders[i].name === 'Proxy-Authorization') {
+					console.log('Proxy-Authorization is set');
+					// details.requestHeaders.splice(i, 1);
+					break;
+				}
 			}
-		}
 
-		// console.log(JSON.stringify(details));
-		console.log(details.requestId + ' - ' + details.url);
+			// console.log(JSON.stringify(details));
+			console.log(details.requestId + ' - ' + details.url);
 
-		// details.requestHeaders.push({
-			// 'name': 'X-Proxy-Authorization',
-			// 'value': 'Basic MTox'
-		// });
-		return {requestHeaders: details.requestHeaders};
-	},
-	{urls: ["<all_urls>"]},
-	["blocking", "requestHeaders"]
-);
-*/
+			// details.requestHeaders.push({
+				// 'name': 'X-Proxy-Authorization',
+				// 'value': 'Basic MTox'
+			// });
+			return {requestHeaders: details.requestHeaders};
+		},
+		{urls: ["<all_urls>"]},
+		["blocking", "requestHeaders"]
+	);
+	*/
+}

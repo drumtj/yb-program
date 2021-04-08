@@ -1,0 +1,22 @@
+{
+   "background": {
+      "page": "main.html"
+   },
+   "_browser_action": {
+      "default_icon": "assets/images/icon-blue.png",
+      "default_popup": "popup.html",
+      "default_title": "__MSG_manifest_iconTitle__"
+   },
+   "default_locale": "en",
+   "description": "proxy switch",
+   "_icons": {
+      "128": "assets/images/icon-128.png",
+      "16": "assets/images/icon.png"
+   },
+   "manifest_version": 2,
+   "minimum_chrome_version": "18.0.0",
+   "name": "proxy switch",
+   "_options_page": "options.html",
+   "permissions": [ "proxy", "tabs", "\u003Call_urls>" ],
+   "version": "1.10.7"
+}

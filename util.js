@@ -12,7 +12,7 @@ module.exports = {
   getScreenSize(){
     var cmd = 'wmic path Win32_VideoController get CurrentHorizontalResolution,CurrentVerticalResolution';
     try{
-      var t = execSync(cmd).toString().match(/\d+/g).map(parseFloat);
+      var t = execSync(cmd).toString().match(/\d+/g).map(a=>parseFloat(a));
       if(t){
         return {
           width: t[0],
@@ -20,7 +20,10 @@ module.exports = {
         }
       }
     }catch(e){
-      return;
+      return {
+        width: 340,
+        height: 300
+      };
     }
   },
 

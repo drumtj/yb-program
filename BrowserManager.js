@@ -1,10 +1,10 @@
 const {v4:uuidv4} = require('uuid');
 const chromeOpen = require('./chrome');
-const {LOCAL_MAIN_URL} = require('./config');
-const luminati = require('./luminatiAPI');
+const {LOCAL_MAIN_URL, USE_PROXY} = require('./config');
+const LuminatiAPI = require('./luminatiAPI');
 // const api = require('./api');
 const API = require('./api');
-let api;
+let api, luminati;
 const {getParamString} = require('./util');
 let EMAIL;
 
@@ -37,47 +37,85 @@ function getBrowsers(){
 
 async function openBrowser(bid, browserData, index){
   // let bid = browserData._id;
+  // require('./test');
   console.log("open browser", bid);
   if(browsers[bid]){
     console.error(bid, "Browser already open");
     return;
   }
 
-  let balance = await luminati.balance();
-  // console.log("balance", balance);
-  if(!balance.status == 'fail'){
-    console.error("[PROXY] " + balance.message);
-    return {
-      status: "fail",
-      message: "[PROXY] " + balance.message
-    };
-  }
 
-  if(balance.data.balance - balance.data.pending_costs <= 0){
-    console.error("[PROXY] need more balance. luminati API");
-    return {
-      status: "fail",
-      message: "[PROXY] need more balance. luminati API"
-    };
-  }
+  // let balance = await luminati.balance();
+  // // console.log("balance", balance);
+  // if(!balance.status == 'fail'){
+  //   console.error("[PROXY] " + balance.message);
+  //   return {
+  //     status: "fail",
+  //     message: "[PROXY] " + balance.message
+  //   };
+  // }
+  //
+  // if(balance.data.balance - balance.data.pending_costs <= 0){
+  //   console.error("[PROXY] need more balance. luminati API");
+  //   return {
+  //     status: "fail",
+  //     message: "[PROXY] need more balance. luminati API"
+  //   };
+  // }
+
 
   // let browserInfo = await api.loadBrowser(bid);
   // if(browserInfo.status != "success"){
   //   console.error(bid, "브라우져 정보 가져오기 실패", browserInfo.message);
   //   return;
   // }
-  // console.error(browserInfo);
   let countryCode = browserData.account.country;
-  let proxy = await api.getProxy(countryCode);
-  if(proxy.status != "success"){
-    console.error(bid, "proxy loading failure.", proxy.message);
-    return {
-      status: "fail",
-      message: "proxy loading failure." + proxy.message
-    };
+  // console.error(browserData);
+
+  let proxyData;
+
+  /// test
+  // browserData.proxyHttp = "124.198.111.32:11959";
+
+  if(browserData.proxy){
+    proxyData = {
+      useCustomProxy: true,
+      proxyHttp: browserData.proxy.proxyHttp
+    }
+  }else{
+    let proxy = await api.getProxy(countryCode);
+    // console.log({proxy});
+    if(proxy.status != "success"){
+      console.error(bid, "proxy loading failure.", proxy.message);
+      return {
+        status: "fail",
+        message: "proxy loading failure." + proxy.message
+      };
+    }
+
+    //////////// 210307
+    if(proxy.data){
+      let balance = await luminati.balance();
+      // console.log("balance", balance);
+      if(!balance.status == 'fail'){
+        console.error("[PROXY] " + balance.message);
+        return {
+          status: "fail",
+          message: "[PROXY] " + balance.message
+        };
+      }
+
+      if(balance.data.balance - balance.data.pending_costs <= 0){
+        console.error("[PROXY] need more balance. luminati");
+        return {
+          status: "fail",
+          message: "[PROXY] need more balance. luminati"
+        };
+      }
+      proxyData = proxy.data;
+    }
   }
-
-
+  ///////////////////
 
   // console.log(browserData.option);
   // console.log(browserData.option.dataType);
@@ -93,7 +131,7 @@ async function openBrowser(bid, browserData, index){
 
 
 
-  let prc = await chromeOpen(chromePath, bid, index, false, LOCAL_MAIN_URL + '?' + paramStr, proxy.data);
+  let prc = await chromeOpen(chromePath, bid, index, false, LOCAL_MAIN_URL + '?' + paramStr, proxyData);
   let browser = createBrowswerObject(prc, browserData);
   browsers[bid] = browser;
   prc.on('exit', function (code) {
@@ -272,9 +310,11 @@ function sendDataToMain(bid, com, data){
 }
 
 
-function setEmail(email){
+async function setEmail(email){
   EMAIL = email;
   api = API(email);
+  let res = await api.getProxy();
+  luminati = LuminatiAPI(res.data.customer, res.data.token);
 }
 
 let io;

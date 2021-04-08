@@ -1,5 +1,25 @@
-const HOST_URL = "http://localhost:8080";
-const API_BASEURL = "http://175.196.220.135/api";
+// let domain = "www.surebet.vip";
+let domain = "158.247.214.242";
+
+// dev
+// domain = "1.235.111.130";
+
+
+// const API_BASEURL = "http://158.247.221.211/api";
+// const API_BASEURL = "http://175.196.220.135/api";
+
+const HOST_URL = `http://${domain}`;
+const LOCAL_HOST_URL = "http://localhost:8080";
+// const API_BASEURL = HOST_URL + "/api";
+
+// const API_BASEURL_LIST = [
+// 	"http://www.surebet.vip/api",
+// 	"http://158.247.221.211/api",
+// 	"http://api.v1.surebet.vip/api",
+// 	"http://api.v2.surebet.vip/api",
+// 	"http://api.v3.surebet.vip/api"
+// ]
+
 let EMAIL = null;
 let BID = null;
 const PN_B365 = "bet365";

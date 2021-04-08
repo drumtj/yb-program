@@ -5,11 +5,12 @@ let localScripts = ["base64.min.js", "uuid.min.js", "axios.min.js", "jquery-3.5.
 let scripts = [
   // "https://jsgetip.appspot.com",
   "https://cdn.socket.io/socket.io-3.0.1.min.js",
+  // "http://localhost:8080/socket.io/socket.io.js",
   ...localScripts.map(o=>chrome.extension.getURL(o)),
-  "http://175.196.220.135/extension/main/bg.js",
-  "http://175.196.220.135/extension/main/api.js",
-  "http://175.196.220.135/extension/main/bet365.js",
-  "http://175.196.220.135/extension/main/main.js"
+  HOST_URL + "/extension/main/bg.js",
+  HOST_URL + "/extension/main/api.js",
+  HOST_URL + "/extension/main/bet365.js",
+  HOST_URL + "/extension/main/main.js"
   // chrome.extension.getURL("main.js")
 ]
 

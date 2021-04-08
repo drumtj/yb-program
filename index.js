@@ -3,12 +3,14 @@ const axios = require('axios');
 const ioClient = require('socket.io-client');
 const config = require('./config');
 const util = require('./util');
-const luminati = require('./luminatiAPI');
+const LuminatiAPI = require('./luminatiAPI');
 const API = require('./api');
-var api;
+var api, luminati;
 // const chromeOpen = require('./chrome');
 const http = require('http');
 const express = require("express");
+const bodyParser = require("body-parser");
+
 const path = require("path");
 const BrowserManager = require("./BrowserManager");
 // const napi = require("./napi");
@@ -17,7 +19,7 @@ const cors = require('cors');
 // const download = require('download-chromium');
 // const fs = require('fs');
 
-let pid, pdata, io, socket;
+let pid, pdata, io, socket, proxy;
 
 
 
@@ -27,9 +29,9 @@ async function proxySetup(){
     return true;
   }
 
-  let proxy = await api.getProxy();
+  // proxy = await api.getProxy();
   if(proxy.status != "success"){
-    console.error(bid, "proxy loading failure.", proxy.message);
+    console.error("proxy loading failure.", proxy.message);
     return;
   }
   //
@@ -41,9 +43,13 @@ async function proxySetup(){
   //   }
   // }
 
+  // console.log("??", proxy);
+
   let proxyInfo = {};
-  for(let countryCode in proxy.data){
-    proxyInfo[proxy.data[countryCode].zone] = proxy.data[countryCode];
+  for(let countryCode in proxy.data.countrys){
+    if(proxy.data.countrys[countryCode].zone){
+      proxyInfo[proxy.data.countrys[countryCode].zone] = proxy.data.countrys[countryCode];
+    }
   }
 
   console.log("proxy info loaded");
@@ -57,7 +63,7 @@ async function proxySetup(){
   }
 
   if(balance.data.balance - balance.data.pending_costs <= 0){
-    console.error("[PROXY] need more balance. luminati API");
+    console.error("[PROXY] need more balance. luminati");
     return false;
   }
 
@@ -116,13 +122,14 @@ function socketSetup(setupSocketEvent){
     let socket = ioClient(config.SOCKET_URL, { transports: ['websocket'] });
     socket.on("connect", async ()=>{
       console.log("socket connected!");
-      socketGroups
+      // socketGroups
       socket.emit("init", {link:"__program__", pid:(await util.getData("PID")), groups:getInDataGroup()});//, email:config.EMAIL});
-
     })
-    socket.on("email", data=>{
+
+    socket.on("email", async data=>{
       // console.error("receive email", data);
       if(!data){
+        console.log("PID를 찾을 수 없음");
         reject();
         return;
       }
@@ -130,6 +137,9 @@ function socketSetup(setupSocketEvent){
       BrowserManager.setEmail(data);
       BrowserManager.setChromePath(chromeIntallPath);
       api = API(data);
+      proxy = await api.getProxy();
+      // console.log(proxy.data);
+      luminati = LuminatiAPI(proxy.data.customer, proxy.data.token);
       resolve(socket);
     })
     if(typeof setupSocketEvent === "function" && socket){
@@ -230,9 +240,80 @@ function localSocketServerSetup(setupSocketEvent){
 
   // console.log(path.join(__dirname, "public"));
   // console.log(path.join(process.cwd(), "public"));
-  // app.use(express.static("public"));
-  app.use('/', express.static(path.join(__dirname, "public")));
+  app.use(express.static("public"));
   app.use(cors());
+  app.use(bodyParser.urlencoded({extended:true}));
+  app.use(bodyParser.json());
+
+  // app.all('*', function(req, res, next) {
+  //   res.header('Access-Control-Allow-Origin', '*');
+  //   res.header('Access-Control-Allow-Credentials', 'true');
+  //   res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  //   res.header(
+  //     'Access-Control-Allow-Headers',
+  //     'Origin, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization'
+  //   );
+  //   next();
+  // });
+
+  // app.use('/api', apiForwardRouter);
+
+  app.get('/', (req, res)=>{
+    res.json({});
+  })
+
+  app.get('*', (req, res, next)=>{
+    if(req.url.startsWith('/api')){
+      // console.log(config.HOST_URL + req.url);
+      // console.log(req.headers.authorization);
+      let headerObj;
+      if(req.headers.authorization){
+        headerObj = {
+          headers: {
+            authorization: req.headers.authorization
+          }
+        }
+      }
+      axios.get(config.HOST_URL + req.url, headerObj).then(r=>{
+        res.json(r.data);
+      }).catch(err=>{
+        res.sendStatus(500);
+      })
+    }else{
+      next();
+    }
+  })
+
+  app.post('*', (req, res, next)=>{
+    if(req.url.startsWith('/api')){
+      // console.log(config.HOST_URL + req.url);
+      // console.log(req.headers.authorization);
+      let headerObj;
+      if(req.headers.authorization){
+        headerObj = {
+          headers: {
+            authorization: req.headers.authorization
+          }
+        }
+      }
+      // console.error("???", req.url, req.body, headerObj, req);
+      axios.post(config.HOST_URL + req.url, req.body, headerObj).then(r=>{
+        res.json(r.data);
+      }).catch(err=>{
+        res.sendStatus(500);
+      })
+    }else{
+      next();
+    }
+  })
+
+  app.use('/', express.static(path.join(__dirname, "public")));
+  // app.use(function(req, res, next) {
+  //   res.setHeader('Access-Control-Allow-Origin', '*');
+  //   res.header("Access-Control-Allow-Methods", "GET, PUT, PATCH, POST, DELETE");
+  //   res.header("Access-Control-Allow-Headers", req.header('access-control-request-headers'));
+  //   next();
+  // });
   // app.use('/socket.io', express.static(path.join(__dirname, "public/socket.io")));
   // app.use(express.static(path.join(process.cwd(), "public")));
 
@@ -302,6 +383,8 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
 
 (async ()=>{
 
+  console.log("HOST_URL", config.HOST_URL);
+
   // let chromeFolder = `${process.cwd()}/chromium`;
   // console.log("start download");
   // chromeIntallPath = await download({
@@ -339,6 +422,7 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
         console.log("toMain", data, uuid);
         if(uuid){
           let r = await BrowserManager.emitPromise(data.bid, data.com, data.data);
+          // socket.emit("resolve", r, uuid, data.com, pid, data.bid);
           socket.emit("resolve", r, uuid);
         }else{
           BrowserManager.emit(data.bid, data.com, data.data);
@@ -380,6 +464,14 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
         // }
       }
 
+      function onReceiveGameurl(data){
+        console.log("receive gameurl", (new Date()).toLocaleTimeString());
+        // BrowserManager.emitTo("gamedata2", "gamedata2", data);
+        for(let bid in socketGroups["gamedata2"]){
+          BrowserManager.emit(bid, "gameurl", data);
+        }
+      }
+
       socket.on("openBrowser", async (bid, browser, index)=>{//, isChecker)=>{
         // console.log({bid, browser})
         // console.log("browser.option", browser.option);
@@ -399,8 +491,9 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
         if(browser.option.data.action == "checkBetmax"){
           dataType = "betburger";
           // chekerBid = bid;
-          socket.emit("joinChecker", bid);
+          // socket.emit("joinChecker", bid);
         }
+
         if(dataType == "betburger"){
           console.log("join gamedata");
           socket.emit("joinDataReceiver", bid);
@@ -415,13 +508,15 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
           socket.emit("joinDataReceiver2", bid);
           socket.off("gamedata2");
           socket.on("gamedata2", onReceiveGamedata2);
+          socket.off("gameurl");
+          socket.on("gameurl", onReceiveGameurl);
           BrowserManager.join(bid, "gamedata2");
           if(!socketGroups["gamedata2"]) socketGroups["gamedata2"] = {};
           socketGroups["gamedata2"][bid] = 1;
         }
         let openResult = await BrowserManager.openBrowser(bid, browser, index);//{isChecker});
         if(openResult && openResult.status == "fail"){
-          socket.emit("log", openResult.message, bid);
+          socket.emit("log", {msg:openResult.message, type:"danger"}, bid);
         }
       })
 
@@ -485,6 +580,7 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
     })
   });
 
+  // return;
   // pid = await keySetup();
 
   // if(!pid){

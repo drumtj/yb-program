@@ -2,5 +2,9 @@ node_modules/
 chromium/
 chromium_backup/
 test/
+test-dev/
+test-v/
 test.zip
+test-dev.zip
+test-v.zip
 yb-program.exe

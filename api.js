@@ -50,6 +50,10 @@ module.exports = email=>{
   }
 
   return {
+    setBaseUrl(url){
+      net.defaults.baseURL = url;
+    },
+
     balance(){
       return ax('/balance');
     },

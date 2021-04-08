@@ -8,17 +8,22 @@ let debug = true;
 
 let tabInfos = {
 	main: {
-		url: HOST_URL + "/main.html",
+		url: LOCAL_HOST_URL + "/main.html",
 		id: undefined
 	},
 	bet365: {
 		url: "https://www.bet365.com",
 		id: undefined
-	},
-	extension: {
-		url: "chrome://extensions/",
-		id: undefined
 	}
+	// extension: {
+	// 	url: "chrome://extensions/",
+	// 	id: undefined
+	// },
+	// ip: {
+	// 	url: "https://ip.pe.kr",
+	// 	// url: "http://lumtest.com/myip.json",
+	// 	id: undefined
+	// }
 }
 
 function setBet365Url(countryCode){
@@ -201,7 +206,7 @@ async function onBgMessage(message){
 			BID = data.bid;
 			setData("ip", data.ip);
 
-			api = setupAPI(API_BASEURL, EMAIL);
+			api = setupAPI(EMAIL);
 			if(data.needPnc){
 				let res = await api.getPncinfo(EMAIL);
 				// console.error("@@@@", res);
@@ -401,7 +406,7 @@ let urlParams;
 function getMainTab(){
 	return new Promise(resolve=>{
 		chrome.tabs.query({
-			url: HOST_URL + "/main.html*"
+			url: LOCAL_HOST_URL + "/main.html*"
 		},tabs=>{
 			console.error(tabs);
 			if(tabs[0]){

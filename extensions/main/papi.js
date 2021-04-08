@@ -44,6 +44,7 @@ class PAPI {
       baseURL: "https://api.pinnacle.com",
       headers: {
         'Authorization': 'Basic ' + Base64.encode(id+':'+pw)
+        // 'cache-control': 'no-cache, must-revalidate, post-check=0, pre-check=0'
       }
     })
 
