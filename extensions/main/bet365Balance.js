@@ -25,11 +25,13 @@ window.addEventListener("load", ()=>{
     // console.error("?", $(".balance-row:first>.balance-column:last>div:last"));
     let moneyText = $(".balance-row:first>.balance-column:last>div:last").text().trim();
     // console.error("??", moneyText);
-    moneyText = moneyText.replace(/[^0-9.,]/g,'');
-    if(moneyText.indexOf('.') == -1 && moneyText.indexOf(',') > -1){
-      moneyText = moneyText.replace(/,/g, '.');
-    }
+    moneyText = moneyText.replace(/[^0-9.]/g,'');
+    // console.error("???", moneyText);
+    // if(moneyText.indexOf('.') == -1 && moneyText.indexOf(',') > -1){
+    //   moneyText = moneyText.replace(/,/g, '.');
+    // }
     let money = parseFloat(moneyText);
+    // console.error("????", money);
     // let key = window.location.href.split('&').pop().replace('key=', '');
     let {key} = param;
 

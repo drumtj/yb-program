@@ -7,14 +7,29 @@
     "js": ["lib.js"],
     "run_at": "document_end"
   }, {
-    "matches": ["https://*.bet365.com/*", "https://*.bet365.de/*", "https://*.nj.bet365.com/*"],
-    "js": ["jquery-3.5.1.slim.min.js", "lib.js", "logger.js"],
-    "run_at": "document_end"
+    "matches": ["https://www.bet365.com/*"],
+    "exclude_matches": ["https://members.bet365.com/*"],
+    "js": ["axios.min.js", "jquery-3.5.1.slim.min.js", "lib.js", "logger.js", "xhrInjection.js"],
+    "run_at": "document_start"
+  }, {
+    "matches": ["https://members.bet365.com/Members/Services/Bank/Bank/Balance*"],
+    "js": ["jquery-3.5.1.slim.min.js", "lib.js", "logger.js", "bet365Balance.js"],
+    "run_at": "document_end",
+    "all_frames": true
+  }, {
+    "matches": ["https://members.bet365.com/he/Authenticated/Bank/Withdrawal*"],
+    "js": ["jquery-3.5.1.slim.min.js", "lib.js", "logger.js", "bet365Withdraw.js"],
+    "run_at": "document_end",
+    "all_frames": true
+  }, {
+    "matches": ["https://members.bet365.com/he/Authenticated*"],
+    "css": ["bankLock.css"],
+    "all_frames": true
   }],
   "manifest_version": 2,
   "name": "main",
-  "permissions": ["tabs", "activeTab", "notifications", "webRequest", "webRequestBlocking", "<all_urls>"],
+  "permissions": ["tabs", "activeTab", "notifications", "webRequest", "webRequestBlocking", "webNavigation", "<all_urls>", "debugger", "ws://*/*", "wss://*/*"],
   "content_security_policy": "default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;",
-  "web_accessible_resources": ["*.js"],
+  "web_accessible_resources": ["*.js", ".css"],
   "version": "2.0"
 }

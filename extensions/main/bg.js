@@ -151,7 +151,9 @@ function runBet365Code(){
 
 function refreshBet365(){
 	chrome.tabs.get(tabInfos.bet365.id, tab=>{
-		chrome.tabs.update(tabInfos.bet365.id, {url:tab.url});
+		var code = 'window.location.reload();';
+  	chrome.tabs.executeScript(tab.id, {code: code});
+		// chrome.tabs.update(tabInfos.bet365.id, {url:tab.url});
 	})
 }
 
@@ -478,7 +480,7 @@ async function init(){
 	setupOnMessage();
 	// setupAuthProxy();
 	// setupModifyRequestHeader();
-	setupStyleImageBlock();
+	// setupStyleImageBlock();
 	// setupMediaBlock();
 	await getMainTab();
 	injectionScript();
