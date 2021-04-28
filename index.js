@@ -383,6 +383,7 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
 
 (async ()=>{
 
+  console.log("VERSION:", config.VERSION);
   console.log("HOST_URL", config.HOST_URL);
 
   // let chromeFolder = `${process.cwd()}/chromium`;
@@ -438,12 +439,17 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
       })
 
       let chekerSocket;
-      function onReceiveGamedata(data){
-        console.log("receive gamedata", (new Date()).toLocaleTimeString());
+      function onReceiveGamedata(data, bid){
+        console.log("receive gamedata", bid, (new Date()).toLocaleTimeString());
         // BrowserManager.emitTo("gamedata", "gamedata", data);
-        for(let bid in socketGroups["gamedata"]){
+        if(socketGroups["gamedata"][bid]){
           BrowserManager.emit(bid, "gamedata", data);
         }
+
+        // for(let _bid in socketGroups["gamedata"]){
+        //   BrowserManager.emit(_bid, "gamedata", data);
+        // }
+
         // if(chekerBid){
         //   BrowserManager.emit(chekerBid, "gamedata", data);
         // }else{
@@ -453,9 +459,13 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
 
       function onReceiveGamedata2(data){
         console.log("receive gamedata2", (new Date()).toLocaleTimeString());
+        // console.log("data", data);
         // BrowserManager.emitTo("gamedata2", "gamedata2", data);
         for(let bid in socketGroups["gamedata2"]){
-          BrowserManager.emit(bid, "gamedata2", data);
+          let dataChannel = socketGroups["gamedata2"][bid];
+          if(data.dataChannel == dataChannel){
+            BrowserManager.emit(bid, "gamedata2", data);
+          }
         }
         // if(chekerBid){
         //   BrowserManager.emit(chekerBid, "gamedata", data);
@@ -468,7 +478,37 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
         console.log("receive gameurl", (new Date()).toLocaleTimeString());
         // BrowserManager.emitTo("gamedata2", "gamedata2", data);
         for(let bid in socketGroups["gamedata2"]){
-          BrowserManager.emit(bid, "gameurl", data);
+          let dataChannel = socketGroups["gamedata2"][bid];
+          if(data.dataChannel == dataChannel){
+            BrowserManager.emit(bid, "gameurl", data);
+          }
+        }
+      }
+
+      function offRegex(socket, regex){
+        socket.eventNames().forEach(name=>{
+          if(regex.test(name)){
+            socket.off(name);
+          }
+        })
+      }
+
+      async function setLoopSocketReceiverEvent(socket, bid){
+        // if(socketGroups["gamedata2"][bid]){
+        //   return;
+        // }
+        while(1){
+          if(socket.connected){
+            socket.emit("joinDataReceiver2");
+
+            socket.off("gamedata2");
+            socket.on("gamedata2", onReceiveGamedata2);
+            socket.off("gameurl");
+            socket.on("gameurl", onReceiveGameurl);
+            await util.delay(1000 * 60 * 5);
+          }else{
+            break;
+          }
         }
       }
 
@@ -487,32 +527,53 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
         BrowserManager.leave(bid, "gamedata");
         BrowserManager.leave(bid, "gamedata2");
 
-        let dataType = browser.option.data.dataType;
-        if(browser.option.data.action == "checkBetmax"){
-          dataType = "betburger";
-          // chekerBid = bid;
-          // socket.emit("joinChecker", bid);
-        }
+        // let dataType = browser.option.data.dataType;
+        // if(browser.option.data.action == "checkBetmax"){
+        //   dataType = "betburger";
+        //   // chekerBid = bid;
+        //   // socket.emit("joinChecker", bid);
+        // }
 
-        if(dataType == "betburger"){
+        let dataChannel = browser.option.data.dataChannel || '1';
+
+        // if(dataType == "betburger"){
+        if(browser.option.data.action == "checkBetmax"){
           console.log("join gamedata");
           socket.emit("joinDataReceiver", bid);
           socket.off("gamedata");
           socket.on("gamedata", onReceiveGamedata);
           BrowserManager.join(bid, "gamedata");
           if(!socketGroups["gamedata"]) socketGroups["gamedata"] = {};
-          socketGroups["gamedata"][bid] = 1;
+          socketGroups["gamedata"][bid] = dataChannel;
           // console.log("!!", socketGroups["gamedata"][bid]);
         }else{//betmax
-          console.log("join gamedata2");
-          socket.emit("joinDataReceiver2", bid);
-          socket.off("gamedata2");
-          socket.on("gamedata2", onReceiveGamedata2);
-          socket.off("gameurl");
-          socket.on("gameurl", onReceiveGameurl);
+
+          console.log("join gamedata2:" + dataChannel);
+          // console.log("join gamedata2");
+          // offRegex(socket, /^game(data2|url).*/);
+          // let eventNames = socket.eventNames();
+          // eventNames.forEach(name=>{
+          //   if(name.indexOf("gamedata2") == 0 || name.indexOf("gameurl") == 0){
+          //     socket.off(name);
+          //   }
+          // })
+
+          // socket.emit("joinDataReceiver2", bid);
+          //
+          // socket.off("gamedata2");
+          // socket.on("gamedata2", onReceiveGamedata2);
+          // socket.off("gameurl");
+          // socket.on("gameurl", onReceiveGameurl);
+
+          // socket.on("gamedata2:"+dataChannel, onReceiveGamedata2);
+          // socket.on("gameurl:"+dataChannel, onReceiveGameurl);
+          // socket.on("gamedata2", onReceiveGamedata2);
+          // socket.on("gameurl", onReceiveGameurl);
           BrowserManager.join(bid, "gamedata2");
+          // BrowserManager.join(bid, "gamedata2:" + dataChannel);
           if(!socketGroups["gamedata2"]) socketGroups["gamedata2"] = {};
-          socketGroups["gamedata2"][bid] = 1;
+          socketGroups["gamedata2"][bid] = dataChannel;
+          setLoopSocketReceiverEvent(socket, bid);
         }
         let openResult = await BrowserManager.openBrowser(bid, browser, index);//{isChecker});
         if(openResult && openResult.status == "fail"){

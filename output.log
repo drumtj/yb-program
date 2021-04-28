@@ -10,6 +10,9 @@
   %1: C:\work\yb-program\public\imgs\dummy.svg
   %2: C:\work\yb-program\package.json
 > [debug] Content of %1 is added to queue. It was required from %2
+  %1: C:\work\yb-program\public\socket.io\socket.io.js
+  %2: C:\work\yb-program\package.json
+> [debug] Content of %1 is added to queue. It was required from %2
   %1: C:\work\yb-program\api.js
   %2: C:\work\yb-program\package.json
 > [debug] Content of %1 is added to queue. It was required from %2
@@ -257,6 +260,8 @@
   %1: C:\work\yb-program\public\main.html
 > [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\public\imgs\dummy.svg
+> [debug] Stat info of %1 is added to queue
+  %1: C:\work\yb-program\public\socket.io\socket.io.js
 > [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\api.js
 > [debug] Stat info of %1 is added to queue
@@ -2987,6 +2992,8 @@
   %1: C:\work\yb-program\public
 > [debug] Directory %1 is added to queue
   %1: C:\work\yb-program\public\imgs
+> [debug] Directory %1 is added to queue
+  %1: C:\work\yb-program\public\socket.io
 > [debug] Directory %1 is added to queue
   %1: C:\work\yb-program
 > [debug] Directory %1 is added to queue
@@ -8641,6 +8648,8 @@
 > [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\public\imgs
 > [debug] Stat info of %1 is added to queue
+  %1: C:\work\yb-program\public\socket.io
+> [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\node_modules\appdata-path
 > [debug] Stat info of %1 is added to queue
   %1: C:\work\yb-program\node_modules\appdata-path\lib
@@ -12739,6 +12748,8 @@
   %1: C:\work
 > [debug] Directory %1 is added to queue
   %1: C:\work\yb-program
+> [debug] Directory %1 is added to queue
+  %1: C:\work\yb-program\public
 > [debug] Directory %1 is added to queue
   %1: C:\work\yb-program\public
 > [debug] Directory %1 is added to queue
@@ -20657,6 +20668,8 @@
 > [debug] The file was included as asset content
   C:\work\yb-program\public\imgs\dummy.svg
 > [debug] The file was included as DISCLOSED code (with sources)
+  C:\work\yb-program\public\socket.io\socket.io.js
+> [debug] The file was included as DISCLOSED code (with sources)
   C:\work\yb-program\api.js
 > [debug] The file was included as DISCLOSED code (with sources)
   C:\work\yb-program\BrowserManager.js
@@ -21180,10 +21193,12 @@
   C:\work\yb-program\node_modules\uuid\dist\umd\uuidVersion.min.js
 > [debug] The file was included as asset content
   C:\work\yb-program\node_modules\uuid\wrapper.mjs
-> [debug] The directory files list was included (2 items)
+> [debug] The directory files list was included (3 items)
   C:\work\yb-program\public
 > [debug] The directory files list was included (1 item)
   C:\work\yb-program\public\imgs
+> [debug] The directory files list was included (1 item)
+  C:\work\yb-program\public\socket.io
 > [debug] The directory files list was included (2 items)
   C:\work\yb-program\node_modules\appdata-path
 > [debug] The directory files list was included (1 item)

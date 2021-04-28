@@ -1,5 +1,5 @@
-// let domain = "www.surebet.vip";
-let domain = "158.247.214.242";
+let domain = "www.surebet.vip";
+// let domain = "158.247.214.242";
 
 // dev
 // domain = "1.235.111.130";
@@ -19,6 +19,8 @@ module.exports = {
   // SOCKET_URL: 'ws://158.247.221.211',
   // HOST_URL: 'http://158.247.221.211',
   // API_BASEURL: 'http://158.247.221.211/api',
+
+  VERSION: 2,
 
   SOCKET_URL: `ws://${domain}`,
   HOST_URL: `http://${domain}`,

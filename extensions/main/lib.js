@@ -1,5 +1,5 @@
-// let domain = "www.surebet.vip";
-let domain = "158.247.214.242";
+let domain = "www.surebet.vip";
+// let domain = "158.247.214.242";
 
 // dev
 // domain = "1.235.111.130";

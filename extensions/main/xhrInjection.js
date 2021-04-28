@@ -27,8 +27,18 @@ function interceptData() {
               localStorage.removeItem('refreshData');
               console.error('betGuid parse fail');
             }
-          },{once:true})
+          }, {once:true})
+        }else if(this.url.includes('/BetsWebAPI/addbet')) {
+          this.addEventListener('load', e=>{
+            try {
+              let o = JSON.parse(this.responseText);
+              localStorage.setItem('betGuid', o.bg);
+            }catch(e){
+              localStorage.removeItem('betGuid');
+            }
+          }, {once:true})
         }
+
         return send.apply(this, arguments);
       };
     }
