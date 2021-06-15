@@ -9,7 +9,7 @@
   }, {
     "matches": ["https://www.bet365.com/*"],
     "exclude_matches": ["https://members.bet365.com/*"],
-    "js": ["axios.min.js", "jquery-3.5.1.slim.min.js", "lib.js", "logger.js", "xhrInjection.js"],
+    "js": ["axios.min.js", "jquery-3.5.1.slim.min.js", "lib.js", "logger.js"],
     "run_at": "document_start"
   }, {
     "matches": ["https://members.bet365.com/Members/Services/Bank/Bank/Balance*"],
@@ -28,7 +28,7 @@
   }],
   "manifest_version": 2,
   "name": "main",
-  "permissions": ["tabs", "activeTab", "notifications", "webRequest", "webRequestBlocking", "webNavigation", "<all_urls>", "debugger", "ws://*/*", "wss://*/*"],
+  "permissions": ["browsingData", "tabs", "activeTab", "notifications", "webRequest", "webRequestBlocking", "webNavigation", "<all_urls>", "debugger", "ws://*/*", "wss://*/*"],
   "content_security_policy": "default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;",
   "web_accessible_resources": ["*.js", ".css"],
   "version": "2.0"

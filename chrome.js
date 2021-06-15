@@ -100,7 +100,7 @@ module.exports = async function chrome(chromePath, bid, index, headless, startin
     '--metrics-recording-only',//UMA에 대한보고를 비활성화하지만 수집은 허용합니다
     // '--in-process-gpu', //GPU 프로세스를 브라우저 프로세스 스레드로 이동하여 일부 메모리 절약
     `--window-position=${position}`,
-    `--window-size=${size}`
+    `--window-size=${size}`,
     //이거사용하면 브라우져 멈춤
     // '--use-gl=egl'
     //이걸 사용하려하면 벳삼이 감지한다.
@@ -113,6 +113,8 @@ module.exports = async function chrome(chromePath, bid, index, headless, startin
     // 코드 무결성검사 비활
     // --disable-features = RendererCodeIntegrity
     // '--user-agent=Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.125 Mobile Safari/537.36'//x
+    '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
+    '--disable-features=UserAgentClientHint'
     // '--use-mobile-user-agent=true'//x
     // '--autoplay-policy=no-user-gesture-required',
     // '--disable-infobars'// x

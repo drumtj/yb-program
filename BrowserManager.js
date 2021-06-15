@@ -5,7 +5,7 @@ const LuminatiAPI = require('./luminatiAPI');
 // const api = require('./api');
 const API = require('./api');
 let api, luminati;
-const {getParamString} = require('./util');
+const {getParamString, delay} = require('./util');
 let EMAIL;
 
 var browsers = {};
@@ -158,7 +158,8 @@ function createBrowswerObject(prc, browserData){
     killed: false,
     kill: function(){
       if(!this.killed){
-        prc.kill('SIGINT');
+        // prc.kill('SIGINT');
+        prc.kill('SIGTERM');
         this.killed = true;
       }
     }
@@ -313,8 +314,20 @@ function sendDataToMain(bid, com, data){
 async function setEmail(email){
   EMAIL = email;
   api = API(email);
-  let res = await api.getProxy();
-  luminati = LuminatiAPI(res.data.customer, res.data.token);
+  let c = 0;
+  while(1){
+    let res = await api.getProxy();
+    if(res.status == "success"){
+      luminati = LuminatiAPI(res.data.customer, res.data.token);
+      break;
+    }
+    c++;
+    if(c > 3){
+      console.error("get Proxy fail");
+      break;
+    }
+    await delay(1000);
+  }
 }
 
 let io;

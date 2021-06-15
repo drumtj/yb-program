@@ -114,7 +114,7 @@ function _sendData(message){
 		// console.log("_sendData", _to, message);
 		chrome.tabs.sendMessage(tabInfos[_to].id, message);
 	}else{
-		console.error(to + "는 tabInfos에 없습니다.")
+		console.error(_to + "는 tabInfos에 없습니다.")
 	}
 }
 

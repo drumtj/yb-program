@@ -442,7 +442,9 @@ let chromeIntallPath = process.cwd() + "/chromium/chrome.exe";
       function onReceiveGamedata(data, bid){
         console.log("receive gamedata", bid, (new Date()).toLocaleTimeString());
         // BrowserManager.emitTo("gamedata", "gamedata", data);
+        // console.log(socketGroups["gamedata"], socketGroups["gamedata"][bid]);
         if(socketGroups["gamedata"][bid]){
+          // console.log("!");
           BrowserManager.emit(bid, "gamedata", data);
         }
 
